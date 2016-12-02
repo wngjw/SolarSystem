@@ -44,7 +44,9 @@
 			<Add directory="C:/MinGW/lib" />
 		</Linker>
 		<Unit filename="include/Orbit.h" />
+		<Unit filename="include/Sphere.h" />
 		<Unit filename="src/Orbit.cpp" />
+		<Unit filename="src/Sphere.cpp" />
 		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />

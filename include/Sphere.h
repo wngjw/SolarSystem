@@ -26,7 +26,7 @@ using namespace glm;
 
 class Sphere {
 public:
-    Sphere(float radius, int slices, vec4 color);
+    Sphere(float radius = 1.0, int slices = 30, vec4 color = vec4(0,0,0,1));
     virtual ~Sphere()
 
     createVao(GLint _vao, GLint _program);
