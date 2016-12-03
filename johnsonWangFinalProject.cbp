@@ -54,6 +54,8 @@
 		<Unit filename="material.h" />
 		<Unit filename="shader.cpp" />
 		<Unit filename="shader.h" />
+		<Unit filename="sphere.cpp" />
+		<Unit filename="sphere.h" />
 		<Unit filename="vertex.h" />
 		<Extensions>
 			<code_completion />
