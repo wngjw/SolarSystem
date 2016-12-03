@@ -1,0 +1,8 @@
+Make cylinder look like a sphere class.
+- Change names
+- Change structure (hopefully) (45 mins, no longer than 2 hours)
+
+Create planet (a second sphere)
+
+Put light source at center of sun and check if it works with planets.
+Change sun materials (remove light properties or make it bright somehow).
