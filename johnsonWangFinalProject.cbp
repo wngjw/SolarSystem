@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="wangLitCylinderTextured" />
+		<Option title="johnsonWangFinalProject" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
@@ -45,8 +45,6 @@
 			<Add library="gdi32" />
 			<Add directory="C:/MinGW/lib" />
 		</Linker>
-		<Unit filename="cylinder.cpp" />
-		<Unit filename="cylinder.h" />
 		<Unit filename="disc.cpp" />
 		<Unit filename="disc.h" />
 		<Unit filename="getbmp.cpp" />
