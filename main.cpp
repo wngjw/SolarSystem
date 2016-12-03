@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
-// litTexturedCylinderShaderized.cpp
+// litTexturedSphereinderShaderized.cpp
 //
-// Forward-compatible core GL 4.3 version of litTexturedCylinder.cpp.
+// Forward-compatible core GL 4.3 version of litTexturedSphereinder.cpp.
 //
 // Interaction:
 // Press x, X, y, Y, z, Z to turn the hemisphere.
@@ -32,7 +32,7 @@
 #include <glm/gtc/matrix_inverse.hpp>
 
 #include "shader.h"
-#include "cylinder.h"
+#include "sphere.h"
 #include "disc.h"
 #include "light.h"
 #include "material.h"
@@ -41,11 +41,11 @@
 using namespace std;
 using namespace glm;
 
-enum object {CYLINDER, DISC}; // VAO ids.
-enum buffer {CYL_VERTICES, CYL_INDICES, DISC_VERTICES}; // VBO ids.
+enum object {SPHEREINDER, DISC}; // VAO ids.
+enum buffer {SPHERE_VERTICES, SPHERE_INDICES, DISC_VERTICES}; // VBO ids.
 
 // Globals.
-static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // Angles to rotate the cylinder.
+static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // Angles to rotate the sphereinder.
 
 // Light properties.
 static const Light light0 =
@@ -69,11 +69,11 @@ static const Material canFandB =
 	50.0f
 };
 
-// Cylinder data.
-static Vertex cylVertices[(CYL_LONGS + 1) * (CYL_LATS + 1)];
-static unsigned int cylIndices[CYL_LATS][2 * (CYL_LONGS + 1)];
-static int cylCounts[CYL_LATS];
-static void* cylOffsets[CYL_LATS];
+// Sphereinder data.
+static Vertex sphereVertices[(SPHERE_LONGS + 1) * (SPHERE_LATS + 1)];
+static unsigned int sphereIndices[SPHERE_LATS][2 * (SPHERE_LONGS + 1)];
+static int sphereCounts[SPHERE_LATS];
+static void* sphereOffsets[SPHERE_LATS];
 
 // Disc data.
 static Vertex discVertices[DISC_SEGS];
@@ -115,8 +115,8 @@ void setup(void)
    glLinkProgram(programId);
    glUseProgram(programId);
 
-   // Initialize cylinder and disc.
-   fillCylinder(cylVertices, cylIndices, cylCounts, cylOffsets);
+   // Initialize sphereinder and disc.
+   fillSphereinder(sphereVertices, sphereIndices, sphereCounts, sphereOffsets);
    fillDiscVertexArray(discVertices);
 
    // Create VAOs and VBOs...
@@ -124,17 +124,17 @@ void setup(void)
    glGenBuffers(3, buffer);
 
    // ...and associate data with vertex shader.
-   glBindVertexArray(vao[CYLINDER]);
-   glBindBuffer(GL_ARRAY_BUFFER, buffer[CYL_VERTICES]);
-   glBufferData(GL_ARRAY_BUFFER, sizeof(cylVertices), cylVertices, GL_STATIC_DRAW);
-   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[CYL_INDICES]);
-   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cylIndices), cylIndices, GL_STATIC_DRAW);
-   glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(cylVertices[0]), 0);
+   glBindVertexArray(vao[SPHEREINDER]);
+   glBindBuffer(GL_ARRAY_BUFFER, buffer[SPHERE_VERTICES]);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(sphereVertices), sphereVertices, GL_STATIC_DRAW);
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[SPHERE_INDICES]);
+   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(sphereIndices), sphereIndices, GL_STATIC_DRAW);
+   glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(sphereVertices[0]), 0);
    glEnableVertexAttribArray(0);
-   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(cylVertices[0]), (void*)sizeof(cylVertices[0].coords));
+   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(sphereVertices[0]), (void*)sizeof(sphereVertices[0].coords));
    glEnableVertexAttribArray(1);
-   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(cylVertices[0]),
-	                                               (void*)(sizeof(cylVertices[0].coords)+sizeof(cylVertices[0].normal)));
+   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(sphereVertices[0]),
+	                                               (void*)(sizeof(sphereVertices[0].coords)+sizeof(sphereVertices[0].normal)));
    glEnableVertexAttribArray(2);
 
    // ...and associate data with vertex shader.
@@ -224,10 +224,10 @@ void drawScene(void)
    normalMat = transpose(inverse(mat3(modelViewMat)));
    glUniformMatrix3fv(normalMatLoc, 1, GL_FALSE, value_ptr(normalMat));
 
-   // Draw cylinder.
-   glUniform1ui(objectLoc, CYLINDER);
-   glBindVertexArray(vao[CYLINDER]);
-   glMultiDrawElements(GL_TRIANGLE_STRIP, cylCounts, GL_UNSIGNED_INT, (const void **)cylOffsets, CYL_LATS);
+   // Draw sphereinder.
+   glUniform1ui(objectLoc, SPHEREINDER);
+   glBindVertexArray(vao[SPHEREINDER]);
+   glMultiDrawElements(GL_TRIANGLE_STRIP, sphereCounts, GL_UNSIGNED_INT, (const void **)sphereOffsets, SPHERE_LATS);
 
    // Draw disc.
 //   glUniform1ui(objectLoc, DISC);
@@ -291,7 +291,7 @@ void keyInput(unsigned char key, int x, int y)
 void printInteraction(void)
 {
    cout << "Interaction:" << endl;
-   cout << "Press x, X, y, Y, z, Z to turn the cylinder." << endl;
+   cout << "Press x, X, y, Y, z, Z to turn the sphereinder." << endl;
 }
 
 // Main routine.

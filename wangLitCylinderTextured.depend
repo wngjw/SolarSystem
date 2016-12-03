@@ -836,3 +836,26 @@
 
 1477974035 u:\cpsc425\glm\glm\gtc\matrix_inverse.inl
 
+1479244483 source:u:\cpsc425\solarsystem\disc.cpp
+	<cmath>
+	<iostream>
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<OpenGL/glext.h>
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<GL/glext.h>
+	"disc.h"
+
+1479244483 u:\cpsc425\solarsystem\disc.h
+	"vertex.h"
+
+1479244482 u:\cpsc425\solarsystem\vertex.h
+	<glm/glm.hpp>
+
+1479244483 source:u:\cpsc425\solarsystem\getbmp.cpp
+	<fstream>
+	"getbmp.h"
+
+1479244483 u:\cpsc425\solarsystem\getbmp.h
+
