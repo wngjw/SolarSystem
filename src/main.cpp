@@ -39,17 +39,20 @@ using namespace std;
 
 Sphere sun;
 
-static unsigned int vertexShaderId, fragmentShaderId, programId, sunVao;
+static mat4 modelViewMat = mat4(1.0);
+static mat4 projMat = mat4(1.0);
+static mat3 normalMat = mat3(1.0);
+
+static const vec4 globAmb = vec4(0.2, 0.2, 0.2, 1.0);
+
+static unsigned int vertexShaderId, fragmentShaderId, programId, sunVao, modelViewMatLoc, normalMatLoc, projMatLoc;
 
 void setup()
 {
     glClearColor(1.0, 1.0, 1.0, 0.0);
     glEnable(GL_DEPTH_TEST);
 
-    // Create shader program executable.
-
     vertexShaderId = setShader("vertex", "vshader53.glsl");
-
     fragmentShaderId = setShader("fragment", "fshader53.glsl");
     programId = glCreateProgram();
     glAttachShader(programId, vertexShaderId);
@@ -57,18 +60,30 @@ void setup()
     glLinkProgram(programId);
     glUseProgram(programId);
 
+    modelViewMatLoc = glGetUniformLocation(programId,"modelViewMat");
+    projMatLoc = glGetUniformLocation(programId,"projMat");
+    normalMatLoc = glGetUniformLocation(programId,"normalMat");
+
     sun = Sphere(5.0, 30, vec4(1, 1, 0, 1));
     sun.createVao(sunVao, programId);
 }
 
 void drawScene()
 {
+    projMat = frustum(-1.0, 1.0, -1.0, 1.0, 1.0, 100.0);
+    glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, value_ptr(projMat));
+
+    //modelViewMat = mat4(1.0);
+    modelViewMat = lookAt(vec3(0.0, 0.0, 10.0), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
+    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+    normalMat = transpose(inverse(mat3(modelViewMat)));
+    glUniformMatrix3fv(normalMatLoc, 1, GL_FALSE, value_ptr(normalMat));
+
     cout << "drawing" << endl;
     sun.draw();
     cout << "end draw" << endl;
 }
 
-// Keyboard input processing routine.
 void keyInput(unsigned char key, int x, int y)
 {
     switch(key)
@@ -95,7 +110,7 @@ int main( int argc, char **argv )
     glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
 
     glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
-    glutInitWindowSize(500, 500);
+    glutInitWindowSize(800, 450);
     glutInitWindowPosition(100, 100);
     glutCreateWindow("Solar System");
     glutDisplayFunc(drawScene);
