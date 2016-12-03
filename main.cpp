@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
-// litTexturedSphereinderShaderized.cpp
+// litTexturedSphereShaderized.cpp
 //
-// Forward-compatible core GL 4.3 version of litTexturedSphereinder.cpp.
+// Forward-compatible core GL 4.3 version of litTexturedSphere.cpp.
 //
 // Interaction:
 // Press x, X, y, Y, z, Z to turn the hemisphere.
@@ -41,11 +41,11 @@
 using namespace std;
 using namespace glm;
 
-enum object {SPHEREINDER, DISC}; // VAO ids.
+enum object {SPHERE, DISC}; // VAO ids.
 enum buffer {SPHERE_VERTICES, SPHERE_INDICES, DISC_VERTICES}; // VBO ids.
 
 // Globals.
-static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // Angles to rotate the sphereinder.
+static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // Angles to rotate the sphere.
 
 // Light properties.
 static const Light light0 =
@@ -69,7 +69,7 @@ static const Material canFandB =
 	50.0f
 };
 
-// Sphereinder data.
+// sphere data.
 static Vertex sphereVertices[(SPHERE_LONGS + 1) * (SPHERE_LATS + 1)];
 static unsigned int sphereIndices[SPHERE_LATS][2 * (SPHERE_LONGS + 1)];
 static int sphereCounts[SPHERE_LATS];
@@ -115,8 +115,8 @@ void setup(void)
    glLinkProgram(programId);
    glUseProgram(programId);
 
-   // Initialize sphereinder and disc.
-   fillSphereinder(sphereVertices, sphereIndices, sphereCounts, sphereOffsets);
+   // Initialize sphere and disc.
+   fillSphere(sphereVertices, sphereIndices, sphereCounts, sphereOffsets);
    fillDiscVertexArray(discVertices);
 
    // Create VAOs and VBOs...
@@ -124,7 +124,7 @@ void setup(void)
    glGenBuffers(3, buffer);
 
    // ...and associate data with vertex shader.
-   glBindVertexArray(vao[SPHEREINDER]);
+   glBindVertexArray(vao[SPHERE]);
    glBindBuffer(GL_ARRAY_BUFFER, buffer[SPHERE_VERTICES]);
    glBufferData(GL_ARRAY_BUFFER, sizeof(sphereVertices), sphereVertices, GL_STATIC_DRAW);
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[SPHERE_INDICES]);
@@ -224,9 +224,9 @@ void drawScene(void)
    normalMat = transpose(inverse(mat3(modelViewMat)));
    glUniformMatrix3fv(normalMatLoc, 1, GL_FALSE, value_ptr(normalMat));
 
-   // Draw sphereinder.
-   glUniform1ui(objectLoc, SPHEREINDER);
-   glBindVertexArray(vao[SPHEREINDER]);
+   // Draw sphere.
+   glUniform1ui(objectLoc, SPHERE);
+   glBindVertexArray(vao[SPHERE]);
    glMultiDrawElements(GL_TRIANGLE_STRIP, sphereCounts, GL_UNSIGNED_INT, (const void **)sphereOffsets, SPHERE_LATS);
 
    // Draw disc.
@@ -291,7 +291,7 @@ void keyInput(unsigned char key, int x, int y)
 void printInteraction(void)
 {
    cout << "Interaction:" << endl;
-   cout << "Press x, X, y, Y, z, Z to turn the sphereinder." << endl;
+   cout << "Press x, X, y, Y, z, Z to turn the sphere." << endl;
 }
 
 // Main routine.

@@ -56,7 +56,8 @@ void fillSphereIndices(unsigned int sphereIndices[SPHERE_LATS][2*(SPHERE_LONGS+1
 void fillSphereCounts(int sphereCounts[SPHERE_LATS])
 {
     int j;
-    for(j = 0; j < SPHERE_LATS; j++) sphereCounts[j] = 2 * (SPHERE_LONGS + 1);
+    for(j = 0; j < SPHERE_LATS; j++)
+        sphereCounts[j] = 2 * (SPHERE_LONGS + 1);
 }
 
 // Fill the array of buffer offsets.
@@ -66,8 +67,8 @@ void fillSphereOffsets(void* sphereOffsets[SPHERE_LATS])
     for(j = 0; j < SPHERE_LATS; j++) sphereOffsets[j] = (GLvoid*)(2 * (SPHERE_LONGS+1) * j * sizeof(unsigned int));
 }
 
-// Initialize the sphereinder.
-void fillSphereinder(Vertex sphereVertices[(SPHERE_LONGS + 1) * (SPHERE_LATS + 1)],
+// Initialize the sphere.
+void fillSphere(Vertex sphereVertices[(SPHERE_LONGS + 1) * (SPHERE_LATS + 1)],
                   unsigned int sphereIndices[SPHERE_LATS][2 * (SPHERE_LONGS + 1)],
                   int sphereCounts[SPHERE_LATS],
                   void* sphereOffsets[SPHERE_LATS])
