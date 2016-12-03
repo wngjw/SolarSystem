@@ -22,14 +22,20 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <cmath>
+
 using namespace glm;
+using namespace std;
+
+const float PI = 3.14159265;
 
 class Sphere {
 public:
     Sphere(float radius = 1.0, int slices = 30, vec4 color = vec4(0,0,0,1));
-    virtual ~Sphere()
+    virtual ~Sphere();
 
-    createVao(GLint _vao, GLint _program);
+    GLint vao;
+    void createVao(GLint _vao, GLint _program);
 
     vec4 *points;
     vec4 *colors;

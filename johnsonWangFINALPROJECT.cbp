@@ -45,9 +45,11 @@
 		</Linker>
 		<Unit filename="include/Orbit.h" />
 		<Unit filename="include/Sphere.h" />
+		<Unit filename="include/shader.h" />
 		<Unit filename="src/Orbit.cpp" />
 		<Unit filename="src/Sphere.cpp" />
 		<Unit filename="src/main.cpp" />
+		<Unit filename="src/shader.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -784,7 +784,7 @@
 1480650666 source:u:\cpsc425\johnsonwangfinalproject\src\orbit.cpp
 	"../include/Orbit.h"
 
-1480652748 source:u:\cpsc425\solarsystem\src\main.cpp
+1480739234 source:u:\cpsc425\solarsystem\src\main.cpp
 	<cmath>
 	<iostream>
 	<fstream>
@@ -797,7 +797,8 @@
 	<glm/glm.hpp>
 	<glm/gtc/matrix_transform.hpp>
 	<glm/gtc/type_ptr.hpp>
-	"../include/Orbit.h"
+	"../include/shader.h"
+	"../include/Sphere.h"
 
 1480652748 u:\cpsc425\solarsystem\include\orbit.h
 	<GL/glew.h>
@@ -810,6 +811,38 @@
 	<glm/gtc/matrix_transform.hpp>
 	<glm/gtc/type_ptr.hpp>
 
-1480652748 source:u:\cpsc425\solarsystem\src\orbit.cpp
+1480652821 source:u:\cpsc425\solarsystem\src\orbit.cpp
 	"../include/Orbit.h"
+
+1480739606 source:u:\cpsc425\solarsystem\src\sphere.cpp
+	<cmath>
+	<iostream>
+	"../include/Sphere.h"
+
+1480736627 u:\cpsc425\solarsystem\include\sphere.h
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<OpenGL/glext.h>
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<GL/glext.h>
+	<glm/glm.hpp>
+	<glm/gtc/matrix_transform.hpp>
+	<glm/gtc/type_ptr.hpp>
+	<cmath>
+
+1480737421 u:\cpsc425\solarsystem\include\shader.h
+
+1480739169 source:u:\cpsc425\solarsystem\src\shader.cpp
+	<cstdlib>
+	<iostream>
+	<fstream>
+	<cstring>
+	"../include/shader.h"
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<OpenGL/glext.h>
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<GL/glext.h>
 
