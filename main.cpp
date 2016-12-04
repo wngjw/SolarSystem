@@ -60,7 +60,16 @@ static const Light light0 =
 static const vec4 globAmb = vec4(0.2, 0.2, 0.2, 1.0);
 
 // Front and back material properties.
-static const Material canFandB =
+static const Material sunMaterial =
+{
+	vec4(1.0, 1.0, 1.0, 1.0),
+	vec4(1.0, 1.0, 1.0, 1.0),
+	vec4(1.0, 1.0, 1.0, 1.0),
+	vec4(1.0, 1.0, 1.0, 1.0),
+	50.0f
+};
+
+static const Material planetMaterial =
 {
 	vec4(1.0, 1.0, 1.0, 1.0),
 	vec4(1.0, 1.0, 1.0, 1.0),
@@ -165,11 +174,11 @@ void setup(void)
    glUniform4fv(glGetUniformLocation(programId, "globAmb"), 1, &globAmb[0]);
 
    // Obtain material property uniform locations and set values.
-   glUniform4fv(glGetUniformLocation(programId, "canFandB.ambRefl"), 1, &canFandB.ambRefl[0]);
-   glUniform4fv(glGetUniformLocation(programId, "canFandB.difRefl"), 1, &canFandB.difRefl[0]);
-   glUniform4fv(glGetUniformLocation(programId, "canFandB.specRefl"), 1, &canFandB.specRefl[0]);
-   glUniform4fv(glGetUniformLocation(programId, "canFandB.emitCols"), 1, &canFandB.emitCols[0]);
-   glUniform1f(glGetUniformLocation(programId, "canFandB.shininess"), canFandB.shininess);
+   glUniform4fv(glGetUniformLocation(programId, "sunMaterial.ambRefl"), 1, &sunMaterial.ambRefl[0]);
+   glUniform4fv(glGetUniformLocation(programId, "sunMaterial.difRefl"), 1, &sunMaterial.difRefl[0]);
+   glUniform4fv(glGetUniformLocation(programId, "sunMaterial.specRefl"), 1, &sunMaterial.specRefl[0]);
+   glUniform4fv(glGetUniformLocation(programId, "sunMaterial.emitCols"), 1, &sunMaterial.emitCols[0]);
+   glUniform1f(glGetUniformLocation(programId, "sunMaterial.shininess"), sunMaterial.shininess);
 
    // Load the images.
    image[0] = getbmp("sun_texture.bmp");
@@ -201,6 +210,7 @@ void setup(void)
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
    canTopTexLoc = glGetUniformLocation(programId, "canTopTex");
    glUniform1i(canTopTexLoc, 1);
+
 }
 
 // Drawing routine.
@@ -227,6 +237,7 @@ void drawScene(void)
    // Draw sphere.
    glUniform1ui(objectLoc, SPHERE);
    glBindVertexArray(vao[SPHERE]);
+
    glMultiDrawElements(GL_TRIANGLE_STRIP, sphereCounts, GL_UNSIGNED_INT, (const void **)sphereOffsets, SPHERE_LATS);
 
    // Draw disc.
@@ -253,32 +264,32 @@ void keyInput(unsigned char key, int x, int y)
          exit(0);
          break;
       case 'x':
-         Xangle += 5.0;
+         Xangle += 0.05;
 		 if (Xangle > 360.0) Xangle -= 360.0;
          glutPostRedisplay();
          break;
       case 'X':
-         Xangle -= 5.0;
+         Xangle -= 0.05;
 		 if (Xangle < 0.0) Xangle += 360.0;
          glutPostRedisplay();
          break;
       case 'y':
-         Yangle += 5.0;
+         Yangle += 0.05;
 		 if (Yangle > 360.0) Yangle -= 360.0;
          glutPostRedisplay();
          break;
       case 'Y':
-         Yangle -= 5.0;
+         Yangle -= 0.05;
 		 if (Yangle < 0.0) Yangle += 360.0;
          glutPostRedisplay();
          break;
       case 'z':
-         Zangle += 5.0;
+         Zangle += 0.05;
 		 if (Zangle > 360.0) Zangle -= 360.0;
          glutPostRedisplay();
          break;
       case 'Z':
-         Zangle -= 5.0;
+         Zangle -= 0.05;
 		 if (Zangle < 0.0) Zangle += 360.0;
          glutPostRedisplay();
          break;

@@ -38,7 +38,7 @@ struct Material
    vec4 emitCols;
    float shininess;
 };
-uniform Material canFandB;
+uniform Material sunMaterial;
 
 vec3 normal, lightDirection, eyeDirection, halfway;
 vec4 frontEmit, frontGlobAmb, frontAmb, frontDif, frontSpec,
@@ -65,20 +65,20 @@ void main(void)
    eyeDirection = -1.0f * normalize(vec3(modelViewMat * coords));
    halfway = (length(lightDirection + eyeDirection) == 0.0f) ? vec3(0.0) : (lightDirection + eyeDirection)/length(lightDirection + eyeDirection);
  
-   frontEmit = canFandB.emitCols;
-   frontGlobAmb = globAmb * canFandB.ambRefl;
-   frontAmb = light0.ambCols * canFandB.ambRefl;
-   frontDif = max(dot(normal, lightDirection), 0.0f) * (light0.difCols * canFandB.difRefl);    
-   frontSpec = pow(max(dot(normal, halfway), 0.0f), canFandB.shininess) * (light0.specCols * canFandB.specRefl);
+   frontEmit = sunMaterial.emitCols;
+   frontGlobAmb = globAmb * sunMaterial.ambRefl;
+   frontAmb = light0.ambCols * sunMaterial.ambRefl;
+   frontDif = max(dot(normal, lightDirection), 0.0f) * (light0.difCols * sunMaterial.difRefl);    
+   frontSpec = pow(max(dot(normal, halfway), 0.0f), sunMaterial.shininess) * (light0.specCols * sunMaterial.specRefl);
    frontAmbDiffExport =  vec4(vec3(min(frontEmit + frontGlobAmb + frontAmb + frontDif, vec4(1.0))), 1.0);  
    frontSpecExport =  vec4(vec3(min(frontSpec, vec4(1.0))), 1.0);  
    
    normal = -1.0f * normal;
-   backEmit = canFandB.emitCols;
-   backGlobAmb = globAmb * canFandB.ambRefl;    
-   backAmb = light0.ambCols * canFandB.ambRefl;
-   backDif = max(dot(normal, lightDirection), 0.0f) * (light0.difCols * canFandB.difRefl);    
-   backSpec = pow(max(dot(normal, halfway), 0.0f), canFandB.shininess) * (light0.specCols * canFandB.specRefl);
+   backEmit = sunMaterial.emitCols;
+   backGlobAmb = globAmb * sunMaterial.ambRefl;    
+   backAmb = light0.ambCols * sunMaterial.ambRefl;
+   backDif = max(dot(normal, lightDirection), 0.0f) * (light0.difCols * sunMaterial.difRefl);    
+   backSpec = pow(max(dot(normal, halfway), 0.0f), sunMaterial.shininess) * (light0.specCols * sunMaterial.specRefl);
    backAmbDiffExport =  vec4(vec3(min(backEmit + backGlobAmb + backAmb + backDif, vec4(1.0))), 1.0);  
    backSpecExport =  vec4(vec3(min(frontSpec, vec4(1.0))), 1.0);  
    
