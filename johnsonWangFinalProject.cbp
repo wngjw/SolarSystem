@@ -8,7 +8,7 @@
 		<Build>
 			<Target title="Debug">
 				<Option output="bin/Debug/wangLitCylinderTextured" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../wangLitCylinderTextured" />
+				<Option working_dir="../SolarSystem" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -18,7 +18,7 @@
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/wangLitCylinderTextured" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../wangLitCylinderTextured" />
+				<Option working_dir="../SolarSystem" />
 				<Option object_output="obj/Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />

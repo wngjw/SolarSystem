@@ -5,9 +5,9 @@
 
 struct Vertex
 {
-   glm::vec4 coords;
-   glm::vec3 normal;
-   glm::vec2 texCoords;
+    glm::vec4 coords;
+    glm::vec3 normal;
+    glm::vec2 texCoords;
 };
 
 #endif
