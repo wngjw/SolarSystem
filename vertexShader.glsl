@@ -69,7 +69,7 @@ void main(void)
     frontGlobAmb = globAmb * sunMaterial.ambRefl;
     frontAmb = light0.ambCols * sunMaterial.ambRefl;
     //frontDif = max(dot(normal, lightDirection), 0.0f) * (light0.difCols * sunMaterial.difRefl);
-    frontDif = max(dot(normal, lightDirection), 0.0f) * (light0.difCols);// * sunMaterial.difRefl);
+    frontDif = dot(normal, lightDirection) * (light0.difCols) * (sunMaterial.difRefl);
     //frontSpec = pow(max(dot(normal, halfway), 0.0f), sunMaterial.shininess) * (light0.specCols * sunMaterial.specRefl);
     frontSpec = vec4(0.0);
     frontAmbDiffExport =  vec4(vec3(min(frontEmit + frontGlobAmb + frontAmb + frontDif, vec4(1.0))), 1.0);

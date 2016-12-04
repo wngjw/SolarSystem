@@ -82,18 +82,25 @@ static mat4 modelViewMat = mat4(1.0);
 static mat4 projMat = mat4(1.0);
 static mat4 normalMat = mat4(1.0);
 
-// sphere data.
+/**
+* Setup configuration for sun
+*/
 static Vertex sphereVertices[(SPHERE_LONGS + 1) * (SPHERE_LATS + 1)];
 static unsigned int sphereIndices[SPHERE_LATS][2 * (SPHERE_LONGS + 1)];
 static int sphereCounts[SPHERE_LATS];
 static void* sphereOffsets[SPHERE_LATS];
 
-// planet data.
+/**
+* Setup configuration for planet
+*/
 static Vertex planetVertices[(SPHERE_LONGS + 1) * (SPHERE_LATS + 1)];
 static unsigned int planetIndices[SPHERE_LATS][2 * (SPHERE_LONGS + 1)];
 static int planetCounts[SPHERE_LATS];
 static void* planetOffsets[SPHERE_LATS];
 
+/**
+ * Setup configuration for shader
+ */
 static unsigned int
 programId,
 vertexShaderId,
@@ -110,11 +117,30 @@ texture[2],
 width,
 height;
 
-static BitMapFile *image[2]; // Local storage for bmp image data.
+static BitMapFile *image[2]; // Bitmap files used as textures
+
+/**
+ * Setup configuration for view rotation
+ */
+vec4 eyeStart = vec4(0.0, 0.0, 5.0, 1.0);
+vec4 eye = eyeStart; // camera location
+mat4 viewRotation;  // rotational part of matrix that transforms between World and Camera coordinates
+vec4 VPN(0,.5,1,0);  // used as starting value for setting uvn
+vec4 VUP(0,1,0,1);  // used as starting value for setting uvn
+
+void calcUVN(vec4 VPN, vec4 VUP)
+{
+    vec4 n = normalize(VPN);
+    vec4 u = vec4(cross(vec3(VUP),vec3(n)),0);
+    u = normalize(u);
+    vec4 v = vec4(cross(vec3(n),vec3(u)),0);
+    viewRotation = mat4(u,v,n,vec4(0,0,0,1));
+}
 
 // Initialization routine.
 void setup(void)
 {
+    calcUVN(VPN, VUP);
     glClearColor(1.0, 1.0, 1.0, 0.0);
     glEnable(GL_DEPTH_TEST);
 
@@ -229,7 +255,7 @@ void drawScene(void)
 
     // Calculate and update modelview matrix.
     modelViewMat = mat4(1.0);
-    modelViewMat = lookAt(vec3(0.0, 0.0, 5.0), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
+    modelViewMat = lookAt(vec3(eye), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
     modelViewMat = rotate(modelViewMat, Zangle, vec3(0.0, 0.0, 1.0));
     modelViewMat = rotate(modelViewMat, Yangle, vec3(0.0, 1.0, 0.0));
     modelViewMat = rotate(modelViewMat, Xangle, vec3(1.0, 0.0, 0.0));
