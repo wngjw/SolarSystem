@@ -53,7 +53,7 @@ static const Light light0 =
     vec4(0.0, 0.0, 0.0, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
-    vec4(0.0, 0.0, 0.0, 0.0)
+    vec4(2.0, 0.0, 0.0, 0.0)
 };
 
 // Global ambient.
@@ -65,7 +65,7 @@ static const Material sunMaterial =
     vec4(1.0, 1.0, 1.0, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
-    vec4(1.0, 1.0, 1.0, 1.0),
+    vec4(0.5, 0.5, 0.5, 0.5),
     50.0f
 };
 
@@ -201,7 +201,7 @@ void setup(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    canLabelTexLoc = glGetUniformLocation(programId, "canLabelTex");
+    canLabelTexLoc = glGetUniformLocation(programId, "sunTex");
     glUniform1i(canLabelTexLoc, 0);
 
     // Bind can top image.
@@ -213,7 +213,7 @@ void setup(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    canTopTexLoc = glGetUniformLocation(programId, "canTopTex");
+    canTopTexLoc = glGetUniformLocation(programId, "planetTex");
     glUniform1i(canTopTexLoc, 1);
 
 }
@@ -229,7 +229,7 @@ void drawScene(void)
 
     // Calculate and update modelview matrix.
     modelViewMat = mat4(1.0);
-    modelViewMat = lookAt(vec3(0.0, 0.0, 3.0), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
+    modelViewMat = lookAt(vec3(0.0, 0.0, 5.0), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
     modelViewMat = rotate(modelViewMat, Zangle, vec3(0.0, 0.0, 1.0));
     modelViewMat = rotate(modelViewMat, Yangle, vec3(0.0, 1.0, 0.0));
     modelViewMat = rotate(modelViewMat, Xangle, vec3(1.0, 0.0, 0.0));

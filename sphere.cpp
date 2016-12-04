@@ -29,9 +29,9 @@ void fillSphereVertexArray(Vertex sphereVertices[(SPHERE_LONGS + 1) * (SPHERE_LA
             sphereVertices[index].coords.y = sin((-1 + 2 * (float)j/SPHERE_LATS) * PI / 2 );
             sphereVertices[index].coords.z = cos((-1 + 2 * (float)j/SPHERE_LATS) * PI / 2 ) * sin( 2.0 * (float)i/SPHERE_LONGS * PI );
             sphereVertices[index].coords.w = 1.0;
-            sphereVertices[index].normal.x = -cos((-1 + 2 * (float)j/SPHERE_LATS) * PI / 2 ) * cos( 2.0 * (float)i/SPHERE_LONGS * PI );
-            sphereVertices[index].normal.y = -sin((-1 + 2 * (float)j/SPHERE_LATS) * PI / 2 );
-            sphereVertices[index].normal.z = -cos((-1 + 2 * (float)j/SPHERE_LATS) * PI / 2 ) * sin( 2.0 * (float)i/SPHERE_LONGS * PI );
+            sphereVertices[index].normal.x = cos((-1 + 2 * (float)j/SPHERE_LATS) * PI / 2 ) * cos( 2.0 * (float)i/SPHERE_LONGS * PI );
+            sphereVertices[index].normal.y = sin((-1 + 2 * (float)j/SPHERE_LATS) * PI / 2 );
+            sphereVertices[index].normal.z = cos((-1 + 2 * (float)j/SPHERE_LATS) * PI / 2 ) * sin( 2.0 * (float)i/SPHERE_LONGS * PI );
             sphereVertices[index].texCoords.s = (float)i / SPHERE_LONGS;
             sphereVertices[index].texCoords.t = (float)j / SPHERE_LATS;
             index++;

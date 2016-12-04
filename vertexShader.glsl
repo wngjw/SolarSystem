@@ -1,14 +1,14 @@
 #version 430 core
 
-#define CYLINDER 0
-#define DISC 1
+const int SUN = 0;
+const int PLANET = 1;
 
-layout(location=0) in vec4 cylCoords;
-layout(location=1) in vec3 cylNormal;
-layout(location=2) in vec2 cylTexCoords;
-layout(location=3) in vec4 discCoords;
-layout(location=4) in vec3 discNormal;
-layout(location=5) in vec2 discTexCoords;
+layout(location=0) in vec4 sunCoords;
+layout(location=1) in vec3 sunNormal;
+layout(location=2) in vec2 sunTexCoords;
+layout(location=3) in vec4 planetCoords;
+layout(location=4) in vec3 planetNormal;
+layout(location=5) in vec2 planetTexCoords;
 
 uniform mat4 modelViewMat;
 uniform mat4 projMat;
@@ -20,23 +20,23 @@ out vec2 texCoordsExport;
 
 struct Light
 {
-   vec4 ambCols;
-   vec4 difCols;
-   vec4 specCols;
-   vec4 coords;
+    vec4 ambCols;
+    vec4 difCols;
+    vec4 specCols;
+    vec4 coords;
 };
 uniform Light light0;
 uniform Light light1;
 
 uniform vec4 globAmb;
-  
+
 struct Material
 {
-   vec4 ambRefl;
-   vec4 difRefl;
-   vec4 specRefl;
-   vec4 emitCols;
-   float shininess;
+    vec4 ambRefl;
+    vec4 difRefl;
+    vec4 specRefl;
+    vec4 emitCols;
+    float shininess;
 };
 uniform Material sunMaterial;
 
@@ -47,40 +47,35 @@ vec4 coords;
 
 void main(void)
 {
-   if (object == CYLINDER)
-   {
-      coords = cylCoords;
-      normal = cylNormal;
-      texCoordsExport = cylTexCoords;
-   }
-   if (object == DISC)
-   {
-      coords = discCoords;
-      normal = discNormal;
-      texCoordsExport = discTexCoords;
-   }
-  
-   normal = normalize(normalMat * normal);
-   lightDirection = normalize(vec3(light0.coords));
-   eyeDirection = -1.0f * normalize(vec3(modelViewMat * coords));
-   halfway = (length(lightDirection + eyeDirection) == 0.0f) ? vec3(0.0) : (lightDirection + eyeDirection)/length(lightDirection + eyeDirection);
- 
-   frontEmit = sunMaterial.emitCols;
-   frontGlobAmb = globAmb * sunMaterial.ambRefl;
-   frontAmb = light0.ambCols * sunMaterial.ambRefl;
-   frontDif = max(dot(normal, lightDirection), 0.0f) * (light0.difCols * sunMaterial.difRefl);    
-   frontSpec = pow(max(dot(normal, halfway), 0.0f), sunMaterial.shininess) * (light0.specCols * sunMaterial.specRefl);
-   frontAmbDiffExport =  vec4(vec3(min(frontEmit + frontGlobAmb + frontAmb + frontDif, vec4(1.0))), 1.0);  
-   frontSpecExport =  vec4(vec3(min(frontSpec, vec4(1.0))), 1.0);  
-   
-   normal = -1.0f * normal;
-   backEmit = sunMaterial.emitCols;
-   backGlobAmb = globAmb * sunMaterial.ambRefl;    
-   backAmb = light0.ambCols * sunMaterial.ambRefl;
-   backDif = max(dot(normal, lightDirection), 0.0f) * (light0.difCols * sunMaterial.difRefl);    
-   backSpec = pow(max(dot(normal, halfway), 0.0f), sunMaterial.shininess) * (light0.specCols * sunMaterial.specRefl);
-   backAmbDiffExport =  vec4(vec3(min(backEmit + backGlobAmb + backAmb + backDif, vec4(1.0))), 1.0);  
-   backSpecExport =  vec4(vec3(min(frontSpec, vec4(1.0))), 1.0);  
-   
-   gl_Position = projMat * modelViewMat * coords;
+    if (object == SUN)
+    {
+        coords = sunCoords;
+        normal = sunNormal;
+        texCoordsExport = sunTexCoords;
+    }
+    if (object == PLANET)
+    {
+        coords = planetCoords;
+        normal = planetNormal;
+        texCoordsExport = planetTexCoords;
+    }
+
+    normal = normalize(normalMat * normal);
+    lightDirection = normalize(vec3(light0.coords));
+    eyeDirection = -1.0f * normalize(vec3(modelViewMat * coords));
+    halfway = (length(lightDirection + eyeDirection) == 0.0f) ? vec3(0.0) : (lightDirection + eyeDirection)/length(lightDirection + eyeDirection);
+
+    frontEmit = sunMaterial.emitCols;
+    frontGlobAmb = globAmb * sunMaterial.ambRefl;
+    frontAmb = light0.ambCols * sunMaterial.ambRefl;
+    //frontDif = max(dot(normal, lightDirection), 0.0f) * (light0.difCols * sunMaterial.difRefl);
+    frontDif = max(dot(normal, lightDirection), 0.0f) * (light0.difCols);// * sunMaterial.difRefl);
+    //frontSpec = pow(max(dot(normal, halfway), 0.0f), sunMaterial.shininess) * (light0.specCols * sunMaterial.specRefl);
+    frontSpec = vec4(0.0);
+    frontAmbDiffExport =  vec4(vec3(min(frontEmit + frontGlobAmb + frontAmb + frontDif, vec4(1.0))), 1.0);
+    frontSpecExport =  vec4(vec3(min(frontSpec, vec4(1.0))), 1.0);
+
+    normal = -1.0f * normal;
+
+    gl_Position = projMat * modelViewMat * coords;
 }

@@ -1,13 +1,13 @@
 #version 430 core
 
-#define CYLINDER 0
-#define DISC 1
+const int SUN = 0;
+const int PLANET = 1;
 
-in vec4 frontAmbDiffExport, frontSpecExport, backAmbDiffExport, backSpecExport;
+in vec4 frontAmbDiffExport, frontSpecExport;
 in vec2 texCoordsExport;
 
-uniform sampler2D canLabelTex;
-uniform sampler2D canTopTex;
+uniform sampler2D sunTex;
+uniform sampler2D planetTex;
 uniform uint object;
 
 out vec4 colorsOut;
@@ -15,10 +15,9 @@ out vec4 colorsOut;
 vec4 texColor;
 
 void main(void)
-{  
-   if (object == CYLINDER) texColor = texture(canLabelTex, texCoordsExport);
-   if (object == DISC) texColor = texture(canTopTex, texCoordsExport);
+{
+    if (object == SUN) texColor = texture(sunTex, texCoordsExport);
+    if (object == PLANET) texColor = texture(planetTex, texCoordsExport);
 
-   colorsOut = gl_FrontFacing? (frontAmbDiffExport * texColor + frontSpecExport) : 
-                               (backAmbDiffExport * texColor + backSpecExport);
+    colorsOut = (frontAmbDiffExport * texColor + frontSpecExport);
 }
