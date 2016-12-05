@@ -3,6 +3,7 @@
 const int SUN = 0;
 const int PLANET = 1;
 const int SKY = 2;
+const int CONE = 3;
 
 layout(location=0) in vec4 sunCoords;
 layout(location=1) in vec3 sunNormal;
@@ -13,6 +14,9 @@ layout(location=5) in vec2 planetTexCoords;
 layout(location=6) in vec4 skyCoords;
 layout(location=7) in vec3 skyNormal;
 layout(location=8) in vec2 skyTexCoords;
+layout(location=9) in vec4 coneCoords;
+layout(location=10) in vec3 coneNormal;
+layout(location=11) in vec2 coneTexCoords;
 
 uniform mat4 modelViewMat;
 uniform mat4 projMat;
@@ -81,6 +85,23 @@ void main(void)
 		coords = skyCoords;
 		normal = skyNormal;
 		texCoordsExport = skyTexCoords;
+		mat.ambRefl = sunMaterial.ambRefl;
+        mat.difRefl = sunMaterial.difRefl;
+        mat.specRefl = sunMaterial.specRefl;
+        mat.emitCols = sunMaterial.emitCols;
+        mat.shininess = sunMaterial.shininess;
+	}
+
+    if (object == CONE)
+	{
+		coords = coneCoords;
+		normal = coneNormal;
+		texCoordsExport = coneTexCoords;
+		mat.ambRefl = planetMaterial.ambRefl;
+        mat.difRefl = planetMaterial.difRefl;
+        mat.specRefl = planetMaterial.specRefl;
+        mat.emitCols = planetMaterial.emitCols;
+        mat.shininess = planetMaterial.shininess;
 	}
 
     normal = normalize(normalMat * normal);

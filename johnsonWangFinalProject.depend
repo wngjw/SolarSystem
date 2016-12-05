@@ -1432,7 +1432,7 @@
 
 1480912205 c:\users\ljohnson7\documents\solarsystem\getbmp.h
 
-1480913162 source:c:\users\ljohnson7\documents\solarsystem\main.cpp
+1480980408 source:c:\users\ljohnson7\documents\solarsystem\main.cpp
 	<cmath>
 	<iostream>
 	<fstream>
@@ -1452,6 +1452,7 @@
 	"material.h"
 	"getbmp.h"
 	"vertex.h"
+	"myCone.h"
 
 1473918302 c:\users\ljohnson7\documents\glm\glm\glm.hpp
 	"detail/_fixes.hpp"
@@ -2000,4 +2001,24 @@
 	<GL/freeglut.h>
 	<GL/glext.h>
 	"sphere.h"
+
+1480980632 source:c:\users\ljohnson7\documents\solarsystem\mycone.cpp
+	"myCone.h"
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<OpenGL/glext.h>
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<GL/glext.h>
+	<cmath>
+	"vertex.h"
+
+1480980629 c:\users\ljohnson7\documents\solarsystem\mycone.h
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<OpenGL/glext.h>
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<GL/glext.h>
+	"vertex.h"
 

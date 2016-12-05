@@ -37,12 +37,13 @@
 #include "material.h"
 #include "getbmp.h"
 #include "vertex.h"
+#include "myCone.h"
 
 using namespace std;
 using namespace glm;
 
-enum object {SPHERE, PLANET, SKY}; // VAO ids.
-enum buffer {SPHERE_VERTICES, SPHERE_INDICES, PLANET_VERTICES, PLANET_INDICES, SKY_VERTICES}; // VBO ids.
+enum object {SPHERE, PLANET, SKY, CONE}; // VAO ids.
+enum buffer {SPHERE_VERTICES, SPHERE_INDICES, PLANET_VERTICES, PLANET_INDICES, SKY_VERTICES, CONE_VERTICES}; // VBO ids.
 
 // Globals.
 static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // Angles to rotate the sphere.
@@ -119,14 +120,17 @@ projMatLoc,
 sunTexLoc,
 canTopTexLoc,
 skyTexLoc,
+hatTexLoc,
 objectLoc,
-buffer[5],
-vao[3],
+buffer[6],
+vao[4],
 texture[3],
 width,
 height;
 
-static BitMapFile *image[3]; // Bitmap files used as textures
+MyCone planetHat = MyCone(1.0, 5.0);
+
+static BitMapFile *image[4]; // Bitmap files used as textures
 
 /**
  * Setup configuration for view rotation
@@ -166,8 +170,8 @@ void setup(void)
     fillSphere(planetVertices, planetIndices, planetCounts, planetOffsets);
 
     // Create VAOs and VBOs...
-    glGenVertexArrays(3, vao);
-    glGenBuffers(5, buffer);
+    glGenVertexArrays(4, vao);
+    glGenBuffers(6, buffer);
     // ...and associate data with vertex shader.
     glBindVertexArray(vao[SPHERE]);
     glBindBuffer(GL_ARRAY_BUFFER, buffer[SPHERE_VERTICES]);
@@ -202,9 +206,18 @@ void setup(void)
     glEnableVertexAttribArray(6);
     glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(skyVertices[0]), (void*)sizeof(skyVertices[0].coords));
     glEnableVertexAttribArray(7);
-    glVertexAttribPointer(8, 2, GL_FLOAT, GL_FALSE, sizeof(skyVertices[0]),
-                          (void*)(sizeof(skyVertices[0].coords) + sizeof(skyVertices[0].normal)));
+    glVertexAttribPointer(8, 2, GL_FLOAT, GL_FALSE, sizeof(skyVertices[0]), (void*)(sizeof(skyVertices[0].coords) + sizeof(skyVertices[0].normal)));
     glEnableVertexAttribArray(8);
+
+    glBindVertexArray(vao[CONE]);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer[CONE_VERTICES]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(planetHat.vertices), planetHat.vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, sizeof(planetHat.vertices[0]), 0);
+    glEnableVertexAttribArray(9);
+    glVertexAttribPointer(10, 3, GL_FLOAT, GL_FALSE, sizeof(planetHat.vertices[0]), (void*)sizeof(planetHat.vertices[0].coords));
+    glEnableVertexAttribArray(10);
+    glVertexAttribPointer(11, 2, GL_FLOAT, GL_FALSE, sizeof(planetHat.vertices[0]), (void*)(sizeof(planetHat.vertices[0].coords) + sizeof(planetHat.vertices[0].normal)));
+    glEnableVertexAttribArray(11);
 
     // Obtain modelview matrix, projection matrix, normal matrix and object uniform locations.
     modelViewMatLoc = glGetUniformLocation(programId,"modelViewMat");
@@ -237,6 +250,7 @@ void setup(void)
     image[0] = getbmp("sun_texture.bmp");
     image[1] = getbmp("earth_texture.bmp");
     image[2] = getbmp("sky_texture.bmp");
+    image[3] = getbmp("hat_texture.bmp");
     // Create texture ids.
     glGenTextures(3, texture);
     // Bind can label image.
@@ -277,6 +291,18 @@ void setup(void)
     glGenerateMipmap(GL_TEXTURE_2D);
     skyTexLoc = glGetUniformLocation(programId, "skyTex");
     glUniform1i(skyTexLoc, 2);
+
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, texture[3]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image[3]->sizeX, image[3]->sizeY, 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, image[3]->data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    hatTexLoc = glGetUniformLocation(programId, "hatTex");
+    glUniform1i(hatTexLoc, 3);
 }
 
 // Drawing routine.
@@ -291,10 +317,10 @@ void drawScene(void)
     // Calculate and update modelview matrix.
     modelViewMat = mat4(1.0);
     modelViewMat = lookAt(vec3(eye), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
+    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
     glUniform1ui(objectLoc, SKY);
     glBindVertexArray(vao[SKY]);
-    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 
@@ -313,13 +339,23 @@ void drawScene(void)
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
     glMultiDrawElements(GL_TRIANGLE_STRIP, sphereCounts, GL_UNSIGNED_INT, (const void **)sphereOffsets, SPHERE_LATS);
 
+    mat4 mvmsave = modelViewMat;
     modelViewMat = translate(modelViewMat, vec3(-2.0, 0.0, 0.0));
     modelViewMat = scale(modelViewMat, vec3(0.2, 0.2, 0.2));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+
     // Draw planet.
     glUniform1ui(objectLoc, PLANET);
     glBindVertexArray(vao[PLANET]);
     glMultiDrawElements(GL_TRIANGLE_STRIP, planetCounts, GL_UNSIGNED_INT, (const void **)planetOffsets, SPHERE_LATS);
+
+    modelViewMat = mvmsave;
+    modelViewMat = translate(modelViewMat, vec3(0.0, 2.0, 0.0));
+    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+
+    glUniform1ui(objectLoc, CONE);
+    glBindVertexArray(vao[CONE]);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, numVertices);
 
     glutSwapBuffers();
 }
