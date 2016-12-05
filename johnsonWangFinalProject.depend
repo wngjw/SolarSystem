@@ -836,7 +836,7 @@
 	<GL/glext.h>
 	"sphere.h"
 
-1480835872 source:c:\users\jwang6\desktop\gfx\solarsystem\disc.cpp
+1480892865 source:c:\users\jwang6\desktop\gfx\solarsystem\disc.cpp
 	<cmath>
 	<iostream>
 	<GL/glew.h>
@@ -847,10 +847,10 @@
 	<GL/glext.h>
 	"disc.h"
 
-1480833427 c:\users\jwang6\desktop\gfx\solarsystem\disc.h
+1480892865 c:\users\jwang6\desktop\gfx\solarsystem\disc.h
 	"vertex.h"
 
-1480835872 c:\users\jwang6\desktop\gfx\solarsystem\vertex.h
+1480892865 c:\users\jwang6\desktop\gfx\solarsystem\vertex.h
 	<glm/glm.hpp>
 
 1477974033 c:\users\jwang6\desktop\gfx\glm\glm\glm.hpp
@@ -1296,13 +1296,13 @@
 
 1477974037 c:\users\jwang6\desktop\gfx\glm\glm\simd\integer.h
 
-1480835872 source:c:\users\jwang6\desktop\gfx\solarsystem\getbmp.cpp
+1480892865 source:c:\users\jwang6\desktop\gfx\solarsystem\getbmp.cpp
 	<fstream>
 	"getbmp.h"
 
-1480835872 c:\users\jwang6\desktop\gfx\solarsystem\getbmp.h
+1480892865 c:\users\jwang6\desktop\gfx\solarsystem\getbmp.h
 
-1480835872 source:c:\users\jwang6\desktop\gfx\solarsystem\shader.cpp
+1480892865 source:c:\users\jwang6\desktop\gfx\solarsystem\shader.cpp
 	<cstdlib>
 	<iostream>
 	<fstream>
@@ -1315,9 +1315,9 @@
 	<GL/freeglut.h>
 	<GL/glext.h>
 
-1480833427 c:\users\jwang6\desktop\gfx\solarsystem\shader.h
+1480892865 c:\users\jwang6\desktop\gfx\solarsystem\shader.h
 
-1480880990 source:c:\users\jwang6\desktop\gfx\solarsystem\sphere.cpp
+1480892865 source:c:\users\jwang6\desktop\gfx\solarsystem\sphere.cpp
 	<cmath>
 	<iostream>
 	<GL/glew.h>
@@ -1328,10 +1328,10 @@
 	<GL/glext.h>
 	"sphere.h"
 
-1480835872 c:\users\jwang6\desktop\gfx\solarsystem\sphere.h
+1480892865 c:\users\jwang6\desktop\gfx\solarsystem\sphere.h
 	"vertex.h"
 
-1480888536 source:c:\users\jwang6\desktop\gfx\solarsystem\main.cpp
+1480911077 source:c:\users\jwang6\desktop\gfx\solarsystem\main.cpp
 	<cmath>
 	<iostream>
 	<fstream>
@@ -1351,6 +1351,7 @@
 	"light.h"
 	"material.h"
 	"getbmp.h"
+	"vertex.h"
 
 1477974035 c:\users\jwang6\desktop\gfx\glm\glm\gtc\matrix_transform.hpp
 	"../mat4x4.hpp"
@@ -1419,9 +1420,9 @@
 
 1477974035 c:\users\jwang6\desktop\gfx\glm\glm\gtc\matrix_inverse.inl
 
-1480835872 c:\users\jwang6\desktop\gfx\solarsystem\light.h
+1480892865 c:\users\jwang6\desktop\gfx\solarsystem\light.h
 	<glm/glm.hpp>
 
-1480835872 c:\users\jwang6\desktop\gfx\solarsystem\material.h
+1480892865 c:\users\jwang6\desktop\gfx\solarsystem\material.h
 	<glm/glm.hpp>
 

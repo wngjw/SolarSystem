@@ -45,8 +45,6 @@
 			<Add library="gdi32" />
 			<Add directory="C:/MinGW/lib" />
 		</Linker>
-		<Unit filename="disc.cpp" />
-		<Unit filename="disc.h" />
 		<Unit filename="getbmp.cpp" />
 		<Unit filename="getbmp.h" />
 		<Unit filename="light.h" />

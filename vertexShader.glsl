@@ -2,6 +2,7 @@
 
 const int SUN = 0;
 const int PLANET = 1;
+const int SKY = 2;
 
 layout(location=0) in vec4 sunCoords;
 layout(location=1) in vec3 sunNormal;
@@ -9,6 +10,9 @@ layout(location=2) in vec2 sunTexCoords;
 layout(location=3) in vec4 planetCoords;
 layout(location=4) in vec3 planetNormal;
 layout(location=5) in vec2 planetTexCoords;
+layout(location=6) in vec4 skyCoords;
+layout(location=7) in vec3 skyNormal;
+layout(location=8) in vec2 skyTexCoords;
 
 uniform mat4 modelViewMat;
 uniform mat4 projMat;
@@ -59,6 +63,13 @@ void main(void)
         normal = planetNormal;
         texCoordsExport = planetTexCoords;
     }
+	
+	if (object == SKY)
+	{
+		coords = skyCoords;
+		normal = skyNormal;
+		texCoordsExport = skyTexCoords;
+	}
 
     normal = normalize(normalMat * normal);
     lightDirection = normalize(vec3(light0.coords));

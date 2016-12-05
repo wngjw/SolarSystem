@@ -33,16 +33,16 @@
 
 #include "shader.h"
 #include "sphere.h"
-#include "disc.h"
 #include "light.h"
 #include "material.h"
 #include "getbmp.h"
+#include "vertex.h"
 
 using namespace std;
 using namespace glm;
 
-enum object {SPHERE, PLANET}; // VAO ids.
-enum buffer {SPHERE_VERTICES, SPHERE_INDICES, PLANET_VERTICES, PLANET_INDICES}; // VBO ids.
+enum object {SPHERE, PLANET, SKY}; // VAO ids.
+enum buffer {SPHERE_VERTICES, SPHERE_INDICES, PLANET_VERTICES, PLANET_INDICES, SKY_VERTICES}; // VBO ids.
 
 // Globals.
 static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // Angles to rotate the sphere.
@@ -78,6 +78,14 @@ static const Material planetMaterial =
     50.0f
 };
 
+static Vertex skyVertices[4] =
+{
+    {vec4(15.0, -15.0, -5.0, 1.0), vec3(1.0), vec2(1.0, 0.0)},
+    {vec4(15.0, 15.0, -5.0, 1.0), vec3(1.0), vec2(1.0, 1.0)},
+    {vec4(-15.0, -15.0, -5.0, 1.0), vec3(1.0), vec2(0.0, 0.0)},
+    {vec4(-15.0, 15.0, -5.0, 1.0), vec3(1.0), vec2(0.0, 1.0)}
+};
+
 static mat4 modelViewMat = mat4(1.0);
 static mat4 projMat = mat4(1.0);
 static mat4 normalMat = mat4(1.0);
@@ -108,16 +116,17 @@ fragmentShaderId,
 modelViewMatLoc,
 normalMatLoc,
 projMatLoc,
-canLabelTexLoc,
+sunTexLoc,
 canTopTexLoc,
+skyTexLoc,
 objectLoc,
-buffer[4],
-vao[2],
-texture[2],
+buffer[5],
+vao[3],
+texture[3],
 width,
 height;
 
-static BitMapFile *image[2]; // Bitmap files used as textures
+static BitMapFile *image[3]; // Bitmap files used as textures
 
 /**
  * Setup configuration for view rotation
@@ -152,15 +161,13 @@ void setup(void)
     glAttachShader(programId, fragmentShaderId);
     glLinkProgram(programId);
     glUseProgram(programId);
-
     // Initialize sphere and disc.
     fillSphere(sphereVertices, sphereIndices, sphereCounts, sphereOffsets);
     fillSphere(planetVertices, planetIndices, planetCounts, planetOffsets);
 
     // Create VAOs and VBOs...
-    glGenVertexArrays(2, vao);
-    glGenBuffers(4, buffer);
-
+    glGenVertexArrays(3, vao);
+    glGenBuffers(5, buffer);
     // ...and associate data with vertex shader.
     glBindVertexArray(vao[SPHERE]);
     glBindBuffer(GL_ARRAY_BUFFER, buffer[SPHERE_VERTICES]);
@@ -172,9 +179,8 @@ void setup(void)
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(sphereVertices[0]), (void*)sizeof(sphereVertices[0].coords));
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(sphereVertices[0]),
-                          (void*)(sizeof(sphereVertices[0].coords)+sizeof(sphereVertices[0].normal)));
+                          (void*)(sizeof(sphereVertices[0].coords) + sizeof(sphereVertices[0].normal)));
     glEnableVertexAttribArray(2);
-
     // ...and associate data with vertex shader.
     glBindVertexArray(vao[PLANET]);
     glBindBuffer(GL_ARRAY_BUFFER, buffer[PLANET_VERTICES]);
@@ -186,15 +192,25 @@ void setup(void)
     glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(planetVertices[0]), (void*)sizeof(planetVertices[0].coords));
     glEnableVertexAttribArray(4);
     glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, sizeof(planetVertices[0]),
-                          (void*)(sizeof(planetVertices[0].coords)+sizeof(planetVertices[0].normal)));
+                          (void*)(sizeof(planetVertices[0].coords) + sizeof(planetVertices[0].normal)));
     glEnableVertexAttribArray(5);
+
+    glBindVertexArray(vao[SKY]);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer[SKY_VERTICES]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyVertices), skyVertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(skyVertices[0]), 0);
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(skyVertices[0]), (void*)sizeof(skyVertices[0].coords));
+    glEnableVertexAttribArray(7);
+    glVertexAttribPointer(8, 2, GL_FLOAT, GL_FALSE, sizeof(skyVertices[0]),
+                          (void*)(sizeof(skyVertices[0].coords) + sizeof(skyVertices[0].normal)));
+    glEnableVertexAttribArray(8);
 
     // Obtain modelview matrix, projection matrix, normal matrix and object uniform locations.
     modelViewMatLoc = glGetUniformLocation(programId,"modelViewMat");
     projMatLoc = glGetUniformLocation(programId,"projMat");
     normalMatLoc = glGetUniformLocation(programId,"normalMat");
     objectLoc = glGetUniformLocation(programId, "object");
-
     // Obtain light property uniform locations and set values.
     glUniform4fv(glGetUniformLocation(programId, "light0.ambCols"), 1, &light0.ambCols[0]);
     glUniform4fv(glGetUniformLocation(programId, "light0.difCols"), 1, &light0.difCols[0]);
@@ -214,10 +230,9 @@ void setup(void)
     // Load the images.
     image[0] = getbmp("sun_texture.bmp");
     image[1] = getbmp("earth_texture.bmp");
-
+    image[2] = getbmp("sky_texture.bmp");
     // Create texture ids.
-    glGenTextures(2, texture);
-
+    glGenTextures(3, texture);
     // Bind can label image.
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture[0]);
@@ -225,10 +240,11 @@ void setup(void)
                  GL_RGBA, GL_UNSIGNED_BYTE, image[0]->data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    canLabelTexLoc = glGetUniformLocation(programId, "sunTex");
-    glUniform1i(canLabelTexLoc, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    sunTexLoc = glGetUniformLocation(programId, "sunTex");
+    glUniform1i(sunTexLoc, 0);
 
     // Bind can top image.
     glActiveTexture(GL_TEXTURE1);
@@ -237,11 +253,24 @@ void setup(void)
                  GL_RGBA, GL_UNSIGNED_BYTE, image[1]->data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glGenerateMipmap(GL_TEXTURE_2D);
     canTopTexLoc = glGetUniformLocation(programId, "planetTex");
     glUniform1i(canTopTexLoc, 1);
 
+    // Bind sky image.
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, texture[2]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image[2]->sizeX, image[2]->sizeY, 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, image[2]->data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    skyTexLoc = glGetUniformLocation(programId, "skyTex");
+    glUniform1i(skyTexLoc, 2);
 }
 
 // Drawing routine.
@@ -250,12 +279,19 @@ void drawScene(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Calculate and update projection matrix.
-    projMat = frustum(-1.0, 1.0, -1.0, 1.0, 1.0, 10.0);
+    projMat = frustum(-1.0, 1.0, -1.0, 1.0, 1.0, 15.0);
     glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, value_ptr(projMat));
 
     // Calculate and update modelview matrix.
     modelViewMat = mat4(1.0);
     modelViewMat = lookAt(vec3(eye), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
+
+    glUniform1ui(objectLoc, SKY);
+    glBindVertexArray(vao[SKY]);
+    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+
     modelViewMat = rotate(modelViewMat, Zangle, vec3(0.0, 0.0, 1.0));
     modelViewMat = rotate(modelViewMat, Yangle, vec3(0.0, 1.0, 0.0));
     modelViewMat = rotate(modelViewMat, Xangle, vec3(1.0, 0.0, 0.0));
@@ -268,14 +304,13 @@ void drawScene(void)
     // Draw sphere.
     glUniform1ui(objectLoc, SPHERE);
     glBindVertexArray(vao[SPHERE]);
-//modelViewMat = translate(modelViewMat, vec3(-1.0, 0.0, 0.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
     glMultiDrawElements(GL_TRIANGLE_STRIP, sphereCounts, GL_UNSIGNED_INT, (const void **)sphereOffsets, SPHERE_LATS);
 
     modelViewMat = translate(modelViewMat, vec3(-2.0, 0.0, 0.0));
     modelViewMat = scale(modelViewMat, vec3(0.2, 0.2, 0.2));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
-    // Draw disc.
+    // Draw planet.
     glUniform1ui(objectLoc, PLANET);
     glBindVertexArray(vao[PLANET]);
     glMultiDrawElements(GL_TRIANGLE_STRIP, planetCounts, GL_UNSIGNED_INT, (const void **)planetOffsets, SPHERE_LATS);
@@ -361,9 +396,7 @@ int main(int argc, char **argv)
 
     glewExperimental = GL_TRUE;
     glewInit();
-
     setup();
-
     glutMainLoop();
 }
 
