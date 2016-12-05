@@ -24,7 +24,7 @@ class MyCone
         MyCone(float radius, float height);
         virtual ~MyCone();
 
-        Vertex vertices[numVertices];
+        Vertex vertices[numVertices + 1];
 };
 
 #endif // CONE_H

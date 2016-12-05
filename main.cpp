@@ -124,11 +124,11 @@ hatTexLoc,
 objectLoc,
 buffer[6],
 vao[4],
-texture[3],
+texture[4],
 width,
 height;
 
-MyCone planetHat = MyCone(1.0, 5.0);
+MyCone planetHat = MyCone(0.2, 1.0);
 
 static BitMapFile *image[4]; // Bitmap files used as textures
 
@@ -252,7 +252,7 @@ void setup(void)
     image[2] = getbmp("sky_texture.bmp");
     image[3] = getbmp("hat_texture.bmp");
     // Create texture ids.
-    glGenTextures(3, texture);
+    glGenTextures(4, texture);
     // Bind can label image.
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture[0]);
@@ -344,18 +344,21 @@ void drawScene(void)
     modelViewMat = scale(modelViewMat, vec3(0.2, 0.2, 0.2));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
+    normalMat = transpose(inverse(mat3(modelViewMat)));
+    glUniformMatrix3fv(normalMatLoc, 1, GL_FALSE, value_ptr(normalMat));
+
     // Draw planet.
     glUniform1ui(objectLoc, PLANET);
     glBindVertexArray(vao[PLANET]);
     glMultiDrawElements(GL_TRIANGLE_STRIP, planetCounts, GL_UNSIGNED_INT, (const void **)planetOffsets, SPHERE_LATS);
 
     modelViewMat = mvmsave;
-    modelViewMat = translate(modelViewMat, vec3(0.0, 2.0, 0.0));
+    modelViewMat = translate(modelViewMat, vec3(-2.0, 0.0, 0.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
     glUniform1ui(objectLoc, CONE);
     glBindVertexArray(vao[CONE]);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, numVertices);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices + 1);
 
     glutSwapBuffers();
 }

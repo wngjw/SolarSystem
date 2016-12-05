@@ -30,17 +30,17 @@ MyCone::MyCone(float radius, float height)
     vertices[0].texCoords.s = 0.0;
     vertices[0].texCoords.t = 1.0;
 
-    for(int i = 1; i < numVertices; i++)
+    for(int i = 0; i <= numVertices; i++)
     {
-        vertices[0].coords.x = (height / i) * i * radius * cos(2 * PI * i / numVertices);
-        vertices[0].coords.y = 0.0;
-        vertices[0].coords.z = (height / i) * i * radius * sin(2 * PI * i / numVertices);
-        vertices[0].coords.w = 1.0;
-        vertices[0].normal.x = cos(2 * PI * i / numVertices);
-        vertices[0].coords.y = radius / height;
-        vertices[0].coords.z = sin(2 * PI * i / numVertices);
-        vertices[0].texCoords.s = 1.0;
-        vertices[0].texCoords.t = 0.0;
+        vertices[i+1].coords.x = radius * cos(2 * PI * i / numVertices);
+        vertices[i+1].coords.y = 0.0;
+        vertices[i+1].coords.z = radius * sin(2 * PI * i / numVertices);
+        vertices[i+1].coords.w = 1.0;
+        vertices[i+1].normal.x = cos(2 * PI * i / numVertices);
+        vertices[i+1].normal.y = radius / height;
+        vertices[i+1].normal.z = sin(2 * PI * i / numVertices);
+        vertices[i+1].texCoords.s = 1.0;
+        vertices[i+1].texCoords.t = 0.0;
     }
 }
 

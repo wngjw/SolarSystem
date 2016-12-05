@@ -28,5 +28,5 @@ void main(void)
 	if (object == SKY) colorsOut = texColor;
 	if (object == SUN) colorsOut = (frontAmbDiffExport * texColor + frontSpecExport);
 	if (object == PLANET) colorsOut = (frontAmbDiffExport * texColor + frontSpecExport);
-    if (object == CONE) colorsOut = texColor;
+    if (object == CONE) colorsOut = (frontAmbDiffExport * texColor + frontSpecExport);
 }
