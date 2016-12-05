@@ -53,7 +53,7 @@ static const Light light0 =
     vec4(0.0, 0.0, 0.0, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
-    vec4(2.0, 0.0, 0.0, 0.0)
+    vec4(0.0, 0.0, 0.0, 0.0)
 };
 
 // Global ambient.
@@ -64,9 +64,9 @@ static const Material sunMaterial =
 {
     vec4(1.0, 1.0, 1.0, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
+    vec4(0.0, 0.0, 0.0, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
-    vec4(0.5, 0.5, 0.5, 0.5),
-    50.0f
+    1000.0f
 };
 
 static const Material planetMaterial =
@@ -75,7 +75,7 @@ static const Material planetMaterial =
     vec4(1.0, 1.0, 1.0, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
     vec4(0.0, 0.0, 0.0, 1.0),
-    50.0f
+    20.0f
 };
 
 static Vertex skyVertices[4] =
@@ -226,6 +226,12 @@ void setup(void)
     glUniform4fv(glGetUniformLocation(programId, "sunMaterial.specRefl"), 1, &sunMaterial.specRefl[0]);
     glUniform4fv(glGetUniformLocation(programId, "sunMaterial.emitCols"), 1, &sunMaterial.emitCols[0]);
     glUniform1f(glGetUniformLocation(programId, "sunMaterial.shininess"), sunMaterial.shininess);
+
+    glUniform4fv(glGetUniformLocation(programId, "planetMaterial.ambRefl"), 1, &planetMaterial.ambRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "planetMaterial.difRefl"), 1, &planetMaterial.difRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "planetMaterial.specRefl"), 1, &planetMaterial.specRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "planetMaterial.emitCols"), 1, &planetMaterial.emitCols[0]);
+    glUniform1f(glGetUniformLocation(programId, "planetMaterial.shininess"), planetMaterial.shininess);
 
     // Load the images.
     image[0] = getbmp("sun_texture.bmp");

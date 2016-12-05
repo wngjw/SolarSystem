@@ -14,7 +14,7 @@ uniform uint object;
 
 out vec4 colorsOut;
 
-vec4 texColor, skyTexColor;
+vec4 texColor;
 
 void main(void)
 {
