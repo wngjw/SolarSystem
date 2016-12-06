@@ -1,3 +1,14 @@
+///////////////////////////////////////////////////////////////////////
+// Tony Wang and Luke Johnson
+//
+// CPSC 425 Final Project
+//
+// shader.cpp
+//
+// this allows us to load the shader files and compile them
+// taken from lit cylinder project
+///////////////////////////////////////////////////////////////////////
+
 #include <cstdlib>
 #include <iostream>
 #include <fstream>

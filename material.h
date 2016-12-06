@@ -1,3 +1,14 @@
+///////////////////////////////////////////////////////////////////////
+// Tony Wang and Luke Johnson
+//
+// CPSC 425 Final Project
+//
+// material.h
+//
+// This creates the material struct for use with the shaders
+// taken from lit cylinder project
+///////////////////////////////////////////////////////////////////////
+
 #ifndef MATERIAL_H
 #define MATERIAL_H
 

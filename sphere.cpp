@@ -1,3 +1,14 @@
+///////////////////////////////////////////////////////////////////////
+// Tony Wang and Luke Johnson
+//
+// CPSC 425 Final Project
+//
+// sphere.cpp
+//
+// This creates a sphere object
+// It was modified from the cylinder.cpp in the lit cylinder project
+///////////////////////////////////////////////////////////////////////
+
 #include <cmath>
 #include <iostream>
 

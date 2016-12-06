@@ -261,7 +261,7 @@
 1480803637 u:\cpsc425\solarsystem\disc.h
 	"vertex.h"
 
-1480803637 u:\cpsc425\solarsystem\vertex.h
+1481046729 u:\cpsc425\solarsystem\vertex.h
 	<glm/glm.hpp>
 
 1473918302 u:\cpsc425\glm\glm\glm.hpp
@@ -707,11 +707,11 @@
 
 1473918304 u:\cpsc425\glm\glm\simd\integer.h
 
-1480803637 source:u:\cpsc425\solarsystem\getbmp.cpp
+1481045941 source:u:\cpsc425\solarsystem\getbmp.cpp
 	<fstream>
 	"getbmp.h"
 
-1480803637 u:\cpsc425\solarsystem\getbmp.h
+1481046329 u:\cpsc425\solarsystem\getbmp.h
 
 1480826951 source:u:\cpsc425\solarsystem\main.cpp
 	<cmath>
@@ -801,9 +801,9 @@
 
 1473918302 u:\cpsc425\glm\glm\gtc\matrix_inverse.inl
 
-1480803637 u:\cpsc425\solarsystem\shader.h
+1481046645 u:\cpsc425\solarsystem\shader.h
 
-1480825659 u:\cpsc425\solarsystem\sphere.h
+1481046623 u:\cpsc425\solarsystem\sphere.h
 	"vertex.h"
 
 1480803637 u:\cpsc425\solarsystem\light.h
@@ -812,7 +812,7 @@
 1480803637 u:\cpsc425\solarsystem\material.h
 	<glm/glm.hpp>
 
-1480803637 source:u:\cpsc425\solarsystem\shader.cpp
+1481046163 source:u:\cpsc425\solarsystem\shader.cpp
 	<cstdlib>
 	<iostream>
 	<fstream>
@@ -825,7 +825,7 @@
 	<GL/freeglut.h>
 	<GL/glext.h>
 
-1480825653 source:u:\cpsc425\solarsystem\sphere.cpp
+1481046243 source:u:\cpsc425\solarsystem\sphere.cpp
 	<cmath>
 	<iostream>
 	<GL/glew.h>
@@ -2034,6 +2034,26 @@
 	"vertex.h"
 
 1480982629 c:\users\jwang6\desktop\gfx\solarsystem\mycone.h
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<OpenGL/glext.h>
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<GL/glext.h>
+	"vertex.h"
+
+1481046011 source:u:\cpsc425\solarsystem\mycone.cpp
+	"myCone.h"
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<OpenGL/glext.h>
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<GL/glext.h>
+	<cmath>
+	"vertex.h"
+
+1481046501 u:\cpsc425\solarsystem\mycone.h
 	<GL/glew.h>
 	<GL/freeglut.h>
 	<OpenGL/glext.h>

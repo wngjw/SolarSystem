@@ -1,14 +1,11 @@
 ///////////////////////////////////////////////////////////////////////
-// litTexturedSphereShaderized.cpp
+// Tony Wang and Luke Johnson
 //
-// Forward-compatible core GL 4.3 version of litTexturedSphere.cpp.
+// CPSC 425 Final Project
 //
-// Interaction:
-// Press x, X, y, Y, z, Z to turn the hemisphere.
+// main.cpp
 //
-// Sumanta Guha
-//
-// Texture Credits: See ExperimenterSource/Textures/TEXTURE_CREDITS.txt
+// This draws the Sun Earth, Mars, and gives the Earth a Christmas Hat.
 ///////////////////////////////////////////////////////////////////////
 
 #include <cmath>
@@ -682,7 +679,7 @@ void keySpecial(int key, int x, int y)
         break;
     case GLUT_KEY_PAGE_UP:
         eye.z -= 0.25;
-        if (eye.z < 7.0) eye.z = 7.0;
+        if (eye.z < 8.0) eye.z = 8.0;
         break;
     }
     glutPostRedisplay();
