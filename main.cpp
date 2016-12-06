@@ -606,33 +606,40 @@ void keyInput(unsigned char key, int x, int y)
     case 27:
         exit(0);
         break;
+    case 'r':
+        center = centerStart;
+        eye = eyeStart;
+        viewAngleX = 0.0;
+        viewAngleY = 0.0;
+        viewAngleZ = 0.0;
+        break;
     case 'x':
-        viewAngleX += 0.05;
+        viewAngleX += 0.01;
         if (viewAngleX > 360.0) viewAngleX = 360.0;
         glutPostRedisplay();
         break;
     case 'X':
-        viewAngleX -= 0.05;
+        viewAngleX -= 0.01;
         if (viewAngleX < 0.0) viewAngleX = 0.0;
         glutPostRedisplay();
         break;
     case 'y':
-        viewAngleY += 0.05;
+        viewAngleY += 0.01;
         if (viewAngleY > 360.0) viewAngleY = 360.0;
         glutPostRedisplay();
         break;
     case 'Y':
-        viewAngleY -= 0.05;
+        viewAngleY -= 0.01;
         if (viewAngleY < 0.0) viewAngleY = 0.0;
         glutPostRedisplay();
         break;
     case 'z':
-        viewAngleZ += 0.05;
+        viewAngleZ += 0.01;
         if (viewAngleZ > 360.0) viewAngleZ = 360.0;
         glutPostRedisplay();
         break;
     case 'Z':
-        viewAngleZ -= 0.05;
+        viewAngleZ -= 0.01;
         if (viewAngleZ < 0.0) viewAngleZ = 0.0;
         glutPostRedisplay();
         break;
@@ -654,28 +661,28 @@ void keySpecial(int key, int x, int y)
     switch(key)
     {
     case GLUT_KEY_LEFT:
-        center.x -= 0.5;
+        center.x -= 0.2;
         if (center.x < -90.0) center.x = -90.0;
         break;
     case GLUT_KEY_RIGHT:
-        center.x += 0.5;
+        center.x += 0.2;
         if (center.x > 90.0) center.x = 90.0;
         break;
     case GLUT_KEY_UP:
-        center.y += 0.5;
+        center.y += 0.2;
         if (center.y > 90.0) center.y = 90.0;
         break;
     case GLUT_KEY_DOWN:
-        center.y -= 0.5;
+        center.y -= 0.2;
         if (center.y < -90.0) center.y = -90.0;
         break;
     case GLUT_KEY_PAGE_DOWN:
         eye.z += 0.25;
-        if (eye.z > 100.0) eye.z = 100.0;
+        if (eye.z > 80.0) eye.z = 70.0;
         break;
     case GLUT_KEY_PAGE_UP:
         eye.z -= 0.25;
-        if (eye.z < 2.0) eye.z = 2.0;
+        if (eye.z < 7.0) eye.z = 7.0;
         break;
     }
     glutPostRedisplay();
@@ -686,6 +693,8 @@ void printInteraction(void)
 {
     cout << "Interaction:" << endl;
     cout << "Press x, X, y, Y, z, Z to turn the sphere." << endl;
+    cout << "Use arrow keys to nudge the camera." << endl;
+    cout << "PageUp and PageDown zoom the camera in and out." << endl;
 }
 
 // Main routine.
@@ -701,7 +710,7 @@ int main(int argc, char **argv)
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(800, 800);
     glutInitWindowPosition(100, 100);
-    glutCreateWindow("The Sun");
+    glutCreateWindow("Solar System");
     glutDisplayFunc(drawScene);
     glutReshapeFunc(resize);
     glutKeyboardFunc(keyInput);
