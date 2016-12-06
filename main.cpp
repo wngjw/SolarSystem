@@ -52,7 +52,7 @@ enum object {SUN, PLANET, SKY, CONE, MARS};
 */
 enum buffer {SUN_VERTICES, SUN_INDICES, PLANET_VERTICES, PLANET_INDICES, SKY_VERTICES, CONE_VERTICES, MARS_VERTICES, MARS_INDICES};
 
-static float viewAngleX = 0.0, viewAngleY = 0.0, viewAngleZ = 0.0;
+static float viewAngleX = 0.1, viewAngleY = 0.05, viewAngleZ = 0.0;
 static float sunAngleX = 0.0, sunAngleY = 0.0, sunAngleZ = 0.0;
 static float earthOrbitX = 0.0, earthOrbitY = 0.0, earthOrbitZ = 0.0;
 static float earthRotateX = 0.0, earthRotateY = 0.0, earthRotateZ = 0.0;
@@ -177,7 +177,7 @@ static BitMapFile *image[4];
 /**
  * Setup configuration for view rotation
  */
-vec4 eyeStart = vec4(0.0, 1.0, 5.0, 1.0);
+vec4 eyeStart = vec4(0.0, 0.0, 5.0, 1.0);
 vec4 eye = eyeStart; // camera location
 mat4 viewRotation;  // rotational part of matrix that transforms between World and Camera coordinates
 vec4 VPN(0,.5,1,0);  // used as starting value for setting uvn
@@ -428,7 +428,7 @@ void drawScene(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     /// Calculate and update projection matrix.
-    projMat = frustum(-1.0, 1.0, -1.0, 1.0, 1.0, 15.0);
+    projMat = frustum(-1.0, 1.0, -1.0, 1.0, 1.0, 20.0);
     glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, value_ptr(projMat));
 
     /// Calculate and update modelview matrix.
@@ -440,6 +440,7 @@ void drawScene(void)
     glBindVertexArray(vao[SKY]);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
+    /// rotate the scene
     modelViewMat = rotate(modelViewMat, viewAngleZ, vec3(0.0, 0.0, 1.0));
     modelViewMat = rotate(modelViewMat, viewAngleY, vec3(0.0, 1.0, 0.0));
     modelViewMat = rotate(modelViewMat, viewAngleX, vec3(1.0, 0.0, 0.0));
@@ -596,6 +597,23 @@ void keyInput(unsigned char key, int x, int y)
     }
 }
 
+void keySpecial(int key, int x, int y)
+{
+    switch(key)
+    {
+    case  GLUT_KEY_PAGE_DOWN:
+        eye.z += 0.1;
+        if (eye.z > 12.0) eye.z = 12.0;
+        break;
+    case GLUT_KEY_PAGE_UP:
+        eye.z -= 0.1;
+        if (eye.z < 2.0) eye.z = 2.0;
+        break;
+    }
+
+    glutPostRedisplay();
+}
+
 // Routine to output interaction instructions to the C++ window.
 void printInteraction(void)
 {
@@ -620,6 +638,7 @@ int main(int argc, char **argv)
     glutDisplayFunc(drawScene);
     glutReshapeFunc(resize);
     glutKeyboardFunc(keyInput);
+    glutSpecialFunc(keySpecial);
 
     glewExperimental = GL_TRUE;
     glewInit();
