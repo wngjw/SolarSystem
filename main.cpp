@@ -52,7 +52,15 @@ enum object {SUN, PLANET, SKY, CONE, MARS};
 */
 enum buffer {SUN_VERTICES, SUN_INDICES, PLANET_VERTICES, PLANET_INDICES, SKY_VERTICES, CONE_VERTICES, MARS_VERTICES, MARS_INDICES};
 
-static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // Angles to rotate the sphere.
+static float sunAngleX = 0.0, sunAngleY = 0.0, sunAngleZ = 0.0;
+static float earthOrbitX = 0.0, earthOrbitY = 0.0, earthOrbitZ = 0.0;
+static float earthRotateX = 0.0, earthRotateY = 0.0, earthRotateZ = 0.0;
+
+/**
+* time between frames in milliseconds
+*/
+static int animationPeriod = 30;
+bool isAnimate = false;
 
 /**
 * Light properties matrix for our light
@@ -421,8 +429,8 @@ void drawScene(void)
     glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, value_ptr(projMat));
 
     /// Calculate and update modelview matrix.
-    modelViewMat = mat4(1.0);
     modelViewMat = lookAt(vec3(eye), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
+    mat4 mvmsave = modelViewMat;
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
     /// Draw the sky
@@ -431,24 +439,29 @@ void drawScene(void)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     /// Handle view rotations
-    modelViewMat = rotate(modelViewMat, Zangle, vec3(0.0, 0.0, 1.0));
-    modelViewMat = rotate(modelViewMat, Yangle, vec3(0.0, 1.0, 0.0));
-    modelViewMat = rotate(modelViewMat, Xangle, vec3(1.0, 0.0, 0.0));
+    modelViewMat = rotate(modelViewMat, sunAngleZ, vec3(0.0, 0.0, 1.0));
+    modelViewMat = rotate(modelViewMat, sunAngleY, vec3(0.0, 1.0, 0.0));
+    modelViewMat = rotate(modelViewMat, sunAngleX, vec3(1.0, 0.0, 0.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
     /// Calculate and update normal matrix.
     normalMat = transpose(inverse(mat3(modelViewMat)));
     glUniformMatrix3fv(normalMatLoc, 1, GL_FALSE, value_ptr(normalMat));
+    modelViewMat = mvmsave;
 
     /// Draw sun.
     glUniform1ui(objectLoc, SUN);
     glBindVertexArray(vao[SUN]);
-    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
     glMultiDrawElements(GL_TRIANGLE_STRIP, sunCounts, GL_UNSIGNED_INT, (const void **)sunOffsets, SPHERE_LATS);
 
-    mat4 mvmsave = modelViewMat;
+    modelViewMat = rotate(modelViewMat, earthOrbitX, vec3(0.0, 0.0, 1.0));
+    modelViewMat = rotate(modelViewMat, earthOrbitY, vec3(0.0, 1.0, 0.0));
+    modelViewMat = rotate(modelViewMat, earthOrbitZ, vec3(1.0, 0.0, 0.0));
     modelViewMat = translate(modelViewMat, vec3(-2.0, 0.0, 0.0));
     modelViewMat = scale(modelViewMat, vec3(0.2, 0.2, 0.2));
+    modelViewMat = rotate(modelViewMat, earthRotateX, vec3(0.0, 0.0, 1.0));
+    modelViewMat = rotate(modelViewMat, earthRotateY, vec3(0.0, 1.0, 0.0));
+    modelViewMat = rotate(modelViewMat, earthRotateZ, vec3(1.0, 0.0, 0.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
     /// Calculate and update normal matrix.
@@ -461,6 +474,24 @@ void drawScene(void)
     glMultiDrawElements(GL_TRIANGLE_STRIP, planetCounts, GL_UNSIGNED_INT, (const void **)planetOffsets, SPHERE_LATS);
 
     modelViewMat = mvmsave;
+    modelViewMat = rotate(modelViewMat, earthOrbitX, vec3(0.0, 0.0, 1.0));
+    modelViewMat = rotate(modelViewMat, earthOrbitY, vec3(0.0, 1.0, 0.0));
+    modelViewMat = rotate(modelViewMat, earthOrbitZ, vec3(1.0, 0.0, 0.0));
+    modelViewMat = translate(modelViewMat, vec3(-2.0, 0.0, 0.0));
+    modelViewMat = rotate(modelViewMat, earthRotateX, vec3(0.0, 0.0, 1.0));
+    modelViewMat = rotate(modelViewMat, earthRotateY, vec3(0.0, 1.0, 0.0));
+    modelViewMat = rotate(modelViewMat, earthRotateZ, vec3(1.0, 0.0, 0.0));
+    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+
+    /// Calculate and update normal matrix.
+    normalMat = transpose(inverse(mat3(modelViewMat)));
+    glUniformMatrix3fv(normalMatLoc, 1, GL_FALSE, value_ptr(normalMat));
+
+    glUniform1ui(objectLoc, CONE);
+    glBindVertexArray(vao[CONE]);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices + 2);
+
+    modelViewMat = mvmsave;
     modelViewMat = translate(modelViewMat, vec3(-3.0, 0.0, 0.0));
     modelViewMat = scale(modelViewMat, vec3(0.2, 0.2, 0.2));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
@@ -469,10 +500,6 @@ void drawScene(void)
     glUniform1ui(objectLoc, MARS);
     glBindVertexArray(vao[MARS]);
     glMultiDrawElements(GL_TRIANGLE_STRIP, marsCounts, GL_UNSIGNED_INT, (const void **)marsOffsets, SPHERE_LATS);
-
-    glUniform1ui(objectLoc, CONE);
-    glBindVertexArray(vao[CONE]);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices + 2);
 
     glutSwapBuffers();
 }
@@ -485,6 +512,21 @@ void resize(int w, int h)
     height = h;
 }
 
+void animate(int value)
+{
+    if (isAnimate)
+    {
+        sunAngleY += 0.05;
+        if (sunAngleY > 360.0) sunAngleY -= 360.0;
+        earthOrbitY += 0.12;
+        if (earthOrbitY > 360.0) earthOrbitY -= 360.0;
+        earthRotateY += 0.25;
+        if (earthRotateY > 360.0) earthRotateY -= 360.0;
+        glutPostRedisplay();
+        glutTimerFunc(animationPeriod, animate, 1);
+    }
+}
+
 // Keyboard input processing routine.
 void keyInput(unsigned char key, int x, int y)
 {
@@ -494,34 +536,42 @@ void keyInput(unsigned char key, int x, int y)
         exit(0);
         break;
     case 'x':
-        Xangle += 0.05;
-        if (Xangle > 360.0) Xangle -= 360.0;
+        sunAngleX += 0.05;
+        if (sunAngleX > 360.0) sunAngleX -= 360.0;
         glutPostRedisplay();
         break;
     case 'X':
-        Xangle -= 0.05;
-        if (Xangle < 0.0) Xangle += 360.0;
+        sunAngleX -= 0.05;
+        if (sunAngleX < 0.0) sunAngleX += 360.0;
         glutPostRedisplay();
         break;
     case 'y':
-        Yangle += 0.05;
-        if (Yangle > 360.0) Yangle -= 360.0;
+        sunAngleY += 0.05;
+        if (sunAngleY > 360.0) sunAngleY -= 360.0;
         glutPostRedisplay();
         break;
     case 'Y':
-        Yangle -= 0.05;
-        if (Yangle < 0.0) Yangle += 360.0;
+        sunAngleY -= 0.05;
+        if (sunAngleY < 0.0) sunAngleY += 360.0;
         glutPostRedisplay();
         break;
     case 'z':
-        Zangle += 0.05;
-        if (Zangle > 360.0) Zangle -= 360.0;
+        sunAngleZ += 0.05;
+        if (sunAngleZ > 360.0) sunAngleZ -= 360.0;
         glutPostRedisplay();
         break;
     case 'Z':
-        Zangle -= 0.05;
-        if (Zangle < 0.0) Zangle += 360.0;
+        sunAngleZ -= 0.05;
+        if (sunAngleZ < 0.0) sunAngleZ += 360.0;
         glutPostRedisplay();
+        break;
+    case ' ':
+        if (isAnimate) isAnimate = 0;
+        else
+        {
+            isAnimate = 1;
+            animate(1);
+        }
         break;
     default:
         break;
