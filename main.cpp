@@ -358,7 +358,7 @@ void drawScene(void)
 
     glUniform1ui(objectLoc, CONE);
     glBindVertexArray(vao[CONE]);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices + 1);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices + 2);
 
     glutSwapBuffers();
 }
