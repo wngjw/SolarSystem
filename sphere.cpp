@@ -36,7 +36,7 @@ void fillSphereVertexArray(Vertex sphereVertices[(SPHERE_LONGS + 1) * (SPHERE_LA
     for (int j = 0; j <= SPHERE_LATS; j++)
         for (int i = 0; i <= SPHERE_LONGS; i++)
         {
-        sphereVertices[index].coords.x = cos((-1 + 2 * (float)j/SPHERE_LATS) * PI / 2 ) * cos( 2.0 * (float)i/SPHERE_LONGS * PI );
+            sphereVertices[index].coords.x = cos((-1 + 2 * (float)j/SPHERE_LATS) * PI / 2 ) * cos( 2.0 * (float)i/SPHERE_LONGS * PI );
             sphereVertices[index].coords.y = sin((-1 + 2 * (float)j/SPHERE_LATS) * PI / 2 );
             sphereVertices[index].coords.z = cos((-1 + 2 * (float)j/SPHERE_LATS) * PI / 2 ) * sin( 2.0 * (float)i/SPHERE_LONGS * PI );
             sphereVertices[index].coords.w = 1.0;
