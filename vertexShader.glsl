@@ -120,7 +120,7 @@ void main(void)
 	}
 
     normal = normalize(normalMat * normal);
-    lightDirection = normalize(vec3(light.coords - modelViewMat * coords));
+    lightDirection = normalize(vec3(modelViewMat * light.coords - modelViewMat * coords));
     eyeDirection = -1.0f * normalize(vec3(modelViewMat * coords));
     halfway = (length(lightDirection + eyeDirection) == 0.0f) ? vec3(0.0) : (lightDirection + eyeDirection)/length(lightDirection + eyeDirection);
 

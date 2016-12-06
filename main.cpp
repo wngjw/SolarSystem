@@ -52,9 +52,12 @@ enum object {SUN, PLANET, SKY, CONE, MARS};
 */
 enum buffer {SUN_VERTICES, SUN_INDICES, PLANET_VERTICES, PLANET_INDICES, SKY_VERTICES, CONE_VERTICES, MARS_VERTICES, MARS_INDICES};
 
+static float viewAngleX = 0.0, viewAngleY = 0.0, viewAngleZ = 0.0;
 static float sunAngleX = 0.0, sunAngleY = 0.0, sunAngleZ = 0.0;
 static float earthOrbitX = 0.0, earthOrbitY = 0.0, earthOrbitZ = 0.0;
 static float earthRotateX = 0.0, earthRotateY = 0.0, earthRotateZ = 0.0;
+static float marsOrbitX = 0.0, marsOrbitY = 0.0, marsOrbitZ = 0.0;
+static float marsRotateX = 0.0, marsRotateY = 0.0, marsRotateZ = 0.0;
 
 /**
 * time between frames in milliseconds
@@ -70,7 +73,7 @@ static const Light light =
     vec4(0.2, 0.2, 0.2, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
-    vec4(0.0, 0.0, 0.0, 0.0)
+    vec4(0.0, 0.0, -4.0, 0.0)
 };
 
 /**
@@ -102,10 +105,10 @@ static const Material planetMaterial =
 */
 static Vertex skyVertices[4] =
 {
-    {vec4(15.0, -15.0, -5.0, 1.0), vec3(1.0), vec2(1.0, 0.0)},
-    {vec4(15.0, 15.0, -5.0, 1.0), vec3(1.0), vec2(1.0, 1.0)},
-    {vec4(-15.0, -15.0, -5.0, 1.0), vec3(1.0), vec2(0.0, 0.0)},
-    {vec4(-15.0, 15.0, -5.0, 1.0), vec3(1.0), vec2(0.0, 1.0)}
+    {vec4(17.0, -17.0, -5.0, 1.0), vec3(1.0), vec2(1.0, 0.0)},
+    {vec4(17.0, 17.0, -5.0, 1.0), vec3(1.0), vec2(1.0, 1.0)},
+    {vec4(-17.0, -17.0, -5.0, 1.0), vec3(1.0), vec2(0.0, 0.0)},
+    {vec4(-17.0, 17.0, -5.0, 1.0), vec3(1.0), vec2(0.0, 1.0)}
 };
 
 /**
@@ -174,7 +177,7 @@ static BitMapFile *image[4];
 /**
  * Setup configuration for view rotation
  */
-vec4 eyeStart = vec4(0.0, 0.0, 5.0, 1.0);
+vec4 eyeStart = vec4(0.0, 1.0, 5.0, 1.0);
 vec4 eye = eyeStart; // camera location
 mat4 viewRotation;  // rotational part of matrix that transforms between World and Camera coordinates
 vec4 VPN(0,.5,1,0);  // used as starting value for setting uvn
@@ -430,13 +433,18 @@ void drawScene(void)
 
     /// Calculate and update modelview matrix.
     modelViewMat = lookAt(vec3(eye), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
-    mat4 mvmsave = modelViewMat;
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
     /// Draw the sky
     glUniform1ui(objectLoc, SKY);
     glBindVertexArray(vao[SKY]);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    modelViewMat = rotate(modelViewMat, viewAngleZ, vec3(0.0, 0.0, 1.0));
+    modelViewMat = rotate(modelViewMat, viewAngleY, vec3(0.0, 1.0, 0.0));
+    modelViewMat = rotate(modelViewMat, viewAngleX, vec3(1.0, 0.0, 0.0));
+    mat4 mvmsave = modelViewMat;
+    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
     /// Handle view rotations
     modelViewMat = rotate(modelViewMat, sunAngleZ, vec3(0.0, 0.0, 1.0));
@@ -492,8 +500,14 @@ void drawScene(void)
     glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices + 2);
 
     modelViewMat = mvmsave;
+    modelViewMat = rotate(modelViewMat, marsOrbitX, vec3(0.0, 0.0, 1.0));
+    modelViewMat = rotate(modelViewMat, marsOrbitY, vec3(0.0, 1.0, 0.0));
+    modelViewMat = rotate(modelViewMat, marsOrbitZ, vec3(1.0, 0.0, 0.0));
     modelViewMat = translate(modelViewMat, vec3(-3.0, 0.0, 0.0));
-    modelViewMat = scale(modelViewMat, vec3(0.2, 0.2, 0.2));
+    modelViewMat = scale(modelViewMat, vec3(0.3, 0.3, 0.3));
+    modelViewMat = rotate(modelViewMat, marsRotateX, vec3(0.0, 0.0, 1.0));
+    modelViewMat = rotate(modelViewMat, marsRotateY, vec3(0.0, 1.0, 0.0));
+    modelViewMat = rotate(modelViewMat, marsRotateZ, vec3(1.0, 0.0, 0.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
     /// Draw mars.
@@ -516,12 +530,16 @@ void animate(int value)
 {
     if (isAnimate)
     {
-        sunAngleY += 0.05;
+        sunAngleY += 0.03;
         if (sunAngleY > 360.0) sunAngleY -= 360.0;
-        earthOrbitY += 0.12;
+        earthOrbitY += 0.05;
         if (earthOrbitY > 360.0) earthOrbitY -= 360.0;
-        earthRotateY += 0.25;
+        earthRotateY += 0.08;
         if (earthRotateY > 360.0) earthRotateY -= 360.0;
+        marsOrbitY += 0.04;
+        if (marsOrbitY > 360.0) marsOrbitY -= 360.0;
+        marsRotateY += 0.07;
+        if (marsRotateY > 360.0) marsRotateY -= 360.0;
         glutPostRedisplay();
         glutTimerFunc(animationPeriod, animate, 1);
     }
@@ -536,33 +554,33 @@ void keyInput(unsigned char key, int x, int y)
         exit(0);
         break;
     case 'x':
-        sunAngleX += 0.05;
-        if (sunAngleX > 360.0) sunAngleX -= 360.0;
+        viewAngleX += 0.05;
+        if (viewAngleX > 360.0) viewAngleX -= 360.0;
         glutPostRedisplay();
         break;
     case 'X':
-        sunAngleX -= 0.05;
-        if (sunAngleX < 0.0) sunAngleX += 360.0;
+        viewAngleX -= 0.05;
+        if (viewAngleX < 0.0) viewAngleX += 360.0;
         glutPostRedisplay();
         break;
     case 'y':
-        sunAngleY += 0.05;
-        if (sunAngleY > 360.0) sunAngleY -= 360.0;
+        viewAngleY += 0.05;
+        if (viewAngleY > 360.0) viewAngleY -= 360.0;
         glutPostRedisplay();
         break;
     case 'Y':
-        sunAngleY -= 0.05;
-        if (sunAngleY < 0.0) sunAngleY += 360.0;
+        viewAngleY -= 0.05;
+        if (viewAngleY < 0.0) viewAngleY += 360.0;
         glutPostRedisplay();
         break;
     case 'z':
-        sunAngleZ += 0.05;
-        if (sunAngleZ > 360.0) sunAngleZ -= 360.0;
+        viewAngleZ += 0.05;
+        if (viewAngleZ > 360.0) viewAngleZ -= 360.0;
         glutPostRedisplay();
         break;
     case 'Z':
-        sunAngleZ -= 0.05;
-        if (sunAngleZ < 0.0) sunAngleZ += 360.0;
+        viewAngleZ -= 0.05;
+        if (viewAngleZ < 0.0) viewAngleZ += 360.0;
         glutPostRedisplay();
         break;
     case ' ':
