@@ -4,6 +4,7 @@ const int SUN = 0;
 const int PLANET = 1;
 const int SKY = 2;
 const int CONE = 3;
+const int MARS = 4;
 
 layout(location=0) in vec4 sunCoords;
 layout(location=1) in vec3 sunNormal;
@@ -17,6 +18,9 @@ layout(location=8) in vec2 skyTexCoords;
 layout(location=9) in vec4 coneCoords;
 layout(location=10) in vec3 coneNormal;
 layout(location=11) in vec2 coneTexCoords;
+layout(location=12) in vec4 marsCoords;
+layout(location=13) in vec3 marsNormal;
+layout(location=14) in vec2 marsTexCoords;
 
 uniform mat4 modelViewMat;
 uniform mat4 projMat;
@@ -96,6 +100,18 @@ void main(void)
 		coords = coneCoords;
 		normal = coneNormal;
 		texCoordsExport = coneTexCoords;
+		mat.matAmbience = planetMaterial.matAmbience;
+        mat.matDiffuse = planetMaterial.matDiffuse;
+        mat.matSpecular = planetMaterial.matSpecular;
+        mat.matEmittance = planetMaterial.matEmittance;
+        mat.matShininess = planetMaterial.matShininess;
+	}
+	
+	if (object == MARS)
+	{
+		coords = marsCoords;
+		normal = marsNormal;
+		texCoordsExport = marsTexCoords;
 		mat.matAmbience = planetMaterial.matAmbience;
         mat.matDiffuse = planetMaterial.matDiffuse;
         mat.matSpecular = planetMaterial.matSpecular;
