@@ -49,16 +49,13 @@ enum buffer {SPHERE_VERTICES, SPHERE_INDICES, PLANET_VERTICES, PLANET_INDICES, S
 static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; // Angles to rotate the sphere.
 
 // Light properties.
-static const Light light0 =
+static const Light light =
 {
-    vec4(0.0, 0.0, 0.0, 1.0),
+    vec4(0.2, 0.2, 0.2, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
     vec4(0.0, 0.0, 0.0, 0.0)
 };
-
-// Global ambient.
-static const vec4 globAmb = vec4(0.2, 0.2, 0.2, 1.0);
 
 // Front and back material properties.
 static const Material sunMaterial =
@@ -150,29 +147,8 @@ void calcUVN(vec4 VPN, vec4 VUP)
     viewRotation = mat4(u,v,n,vec4(0,0,0,1));
 }
 
-// Initialization routine.
-void setup(void)
+void createVaoSun()
 {
-    calcUVN(VPN, VUP);
-    glClearColor(1.0, 1.0, 1.0, 0.0);
-    glEnable(GL_DEPTH_TEST);
-
-    // Create shader program executable.
-    vertexShaderId = setShader("vertex", "vertexShader.glsl");
-    fragmentShaderId = setShader("fragment", "fragmentShader.glsl");
-    programId = glCreateProgram();
-    glAttachShader(programId, vertexShaderId);
-    glAttachShader(programId, fragmentShaderId);
-    glLinkProgram(programId);
-    glUseProgram(programId);
-    // Initialize sphere and disc.
-    fillSphere(sphereVertices, sphereIndices, sphereCounts, sphereOffsets);
-    fillSphere(planetVertices, planetIndices, planetCounts, planetOffsets);
-
-    // Create VAOs and VBOs...
-    glGenVertexArrays(4, vao);
-    glGenBuffers(6, buffer);
-    // ...and associate data with vertex shader.
     glBindVertexArray(vao[SPHERE]);
     glBindBuffer(GL_ARRAY_BUFFER, buffer[SPHERE_VERTICES]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(sphereVertices), sphereVertices, GL_STATIC_DRAW);
@@ -185,7 +161,10 @@ void setup(void)
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(sphereVertices[0]),
                           (void*)(sizeof(sphereVertices[0].coords) + sizeof(sphereVertices[0].normal)));
     glEnableVertexAttribArray(2);
-    // ...and associate data with vertex shader.
+}
+
+void createVaoPlanet()
+{
     glBindVertexArray(vao[PLANET]);
     glBindBuffer(GL_ARRAY_BUFFER, buffer[PLANET_VERTICES]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(planetVertices), planetVertices, GL_STATIC_DRAW);
@@ -198,7 +177,10 @@ void setup(void)
     glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, sizeof(planetVertices[0]),
                           (void*)(sizeof(planetVertices[0].coords) + sizeof(planetVertices[0].normal)));
     glEnableVertexAttribArray(5);
+}
 
+void createVaoSky()
+{
     glBindVertexArray(vao[SKY]);
     glBindBuffer(GL_ARRAY_BUFFER, buffer[SKY_VERTICES]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(skyVertices), skyVertices, GL_STATIC_DRAW);
@@ -208,7 +190,10 @@ void setup(void)
     glEnableVertexAttribArray(7);
     glVertexAttribPointer(8, 2, GL_FLOAT, GL_FALSE, sizeof(skyVertices[0]), (void*)(sizeof(skyVertices[0].coords) + sizeof(skyVertices[0].normal)));
     glEnableVertexAttribArray(8);
+}
 
+void createVaoCone()
+{
     glBindVertexArray(vao[CONE]);
     glBindBuffer(GL_ARRAY_BUFFER, buffer[CONE_VERTICES]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(planetHat.vertices), planetHat.vertices, GL_STATIC_DRAW);
@@ -218,42 +203,74 @@ void setup(void)
     glEnableVertexAttribArray(10);
     glVertexAttribPointer(11, 2, GL_FLOAT, GL_FALSE, sizeof(planetHat.vertices[0]), (void*)(sizeof(planetHat.vertices[0].coords) + sizeof(planetHat.vertices[0].normal)));
     glEnableVertexAttribArray(11);
+}
 
-    // Obtain modelview matrix, projection matrix, normal matrix and object uniform locations.
-    modelViewMatLoc = glGetUniformLocation(programId,"modelViewMat");
-    projMatLoc = glGetUniformLocation(programId,"projMat");
-    normalMatLoc = glGetUniformLocation(programId,"normalMat");
+void createAndLinkShader()
+{
+    vertexShaderId = setShader("vertex", "vertexShader.glsl");
+    fragmentShaderId = setShader("fragment", "fragmentShader.glsl");
+    programId = glCreateProgram();
+    glAttachShader(programId, vertexShaderId);
+    glAttachShader(programId, fragmentShaderId);
+    glLinkProgram(programId);
+    glUseProgram(programId);
+}
+
+// Initialization routine.
+void setup(void)
+{
+    calcUVN(VPN, VUP);
+
+    glClearColor(1.0, 1.0, 1.0, 0.0);
+    glEnable(GL_DEPTH_TEST);
+
+    createAndLinkShader();
+
+    fillSphere(sphereVertices, sphereIndices, sphereCounts, sphereOffsets);
+    fillSphere(planetVertices, planetIndices, planetCounts, planetOffsets);
+
+    /// Create VAO's
+    glGenVertexArrays(4, vao);
+    glGenBuffers(6, buffer);
+    createVaoSun();
+    createVaoPlanet();
+    createVaoSky();
+    createVaoCone();
+
+    /// Obtain modelview matrix, projection matrix, normal matrix and object uniform locations.
+    modelViewMatLoc = glGetUniformLocation(programId, "modelViewMat");
+    projMatLoc = glGetUniformLocation(programId, "projMat");
+    normalMatLoc = glGetUniformLocation(programId, "normalMat");
     objectLoc = glGetUniformLocation(programId, "object");
-    // Obtain light property uniform locations and set values.
-    glUniform4fv(glGetUniformLocation(programId, "light0.ambCols"), 1, &light0.ambCols[0]);
-    glUniform4fv(glGetUniformLocation(programId, "light0.difCols"), 1, &light0.difCols[0]);
-    glUniform4fv(glGetUniformLocation(programId, "light0.specCols"), 1, &light0.specCols[0]);
-    glUniform4fv(glGetUniformLocation(programId, "light0.coords"), 1, &light0.coords[0]);
 
-    // Obtain global ambient uniform location and set value.
-    glUniform4fv(glGetUniformLocation(programId, "globAmb"), 1, &globAmb[0]);
+    /// Obtain light property uniform locations and set values.
+    glUniform4fv(glGetUniformLocation(programId, "light.lightAmbience"), 1, &light.ambCols[0]);
+    glUniform4fv(glGetUniformLocation(programId, "light.lightDiffuse"), 1, &light.difCols[0]);
+    glUniform4fv(glGetUniformLocation(programId, "light.lightSpecular"), 1, &light.specCols[0]);
+    glUniform4fv(glGetUniformLocation(programId, "light.coords"), 1, &light.coords[0]);
 
-    // Obtain material property uniform locations and set values.
-    glUniform4fv(glGetUniformLocation(programId, "sunMaterial.ambRefl"), 1, &sunMaterial.ambRefl[0]);
-    glUniform4fv(glGetUniformLocation(programId, "sunMaterial.difRefl"), 1, &sunMaterial.difRefl[0]);
-    glUniform4fv(glGetUniformLocation(programId, "sunMaterial.specRefl"), 1, &sunMaterial.specRefl[0]);
-    glUniform4fv(glGetUniformLocation(programId, "sunMaterial.emitCols"), 1, &sunMaterial.emitCols[0]);
-    glUniform1f(glGetUniformLocation(programId, "sunMaterial.shininess"), sunMaterial.shininess);
+    /// Obtain material property uniform locations and set values.
+    glUniform4fv(glGetUniformLocation(programId, "sunMaterial.matAmbience"), 1, &sunMaterial.ambRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "sunMaterial.matDiffuse"), 1, &sunMaterial.difRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "sunMaterial.matSpecular"), 1, &sunMaterial.specRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "sunMaterial.matEmittance"), 1, &sunMaterial.emitCols[0]);
+    glUniform1f(glGetUniformLocation(programId, "sunMaterial.matShininess"), sunMaterial.shininess);
 
-    glUniform4fv(glGetUniformLocation(programId, "planetMaterial.ambRefl"), 1, &planetMaterial.ambRefl[0]);
-    glUniform4fv(glGetUniformLocation(programId, "planetMaterial.difRefl"), 1, &planetMaterial.difRefl[0]);
-    glUniform4fv(glGetUniformLocation(programId, "planetMaterial.specRefl"), 1, &planetMaterial.specRefl[0]);
-    glUniform4fv(glGetUniformLocation(programId, "planetMaterial.emitCols"), 1, &planetMaterial.emitCols[0]);
-    glUniform1f(glGetUniformLocation(programId, "planetMaterial.shininess"), planetMaterial.shininess);
+    glUniform4fv(glGetUniformLocation(programId, "planetMaterial.matAmbience"), 1, &planetMaterial.ambRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "planetMaterial.matDiffuse"), 1, &planetMaterial.difRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "planetMaterial.matSpecular"), 1, &planetMaterial.specRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "planetMaterial.matEmittance"), 1, &planetMaterial.emitCols[0]);
+    glUniform1f(glGetUniformLocation(programId, "planetMaterial.matShininess"), planetMaterial.shininess);
 
-    // Load the images.
+    /// Load the images.
     image[0] = getbmp("sun_texture.bmp");
     image[1] = getbmp("earth_texture.bmp");
     image[2] = getbmp("sky_texture.bmp");
     image[3] = getbmp("hat_texture.bmp");
-    // Create texture ids.
+
+    /// Create texture ids.
     glGenTextures(4, texture);
-    // Bind can label image.
+    /// Bind sun image.
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture[0]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image[0]->sizeX, image[0]->sizeY, 0,
@@ -266,7 +283,7 @@ void setup(void)
     sunTexLoc = glGetUniformLocation(programId, "sunTex");
     glUniform1i(sunTexLoc, 0);
 
-    // Bind can top image.
+    /// Bind earth image.
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture[1]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image[1]->sizeX, image[1]->sizeY, 0,
@@ -279,7 +296,7 @@ void setup(void)
     canTopTexLoc = glGetUniformLocation(programId, "planetTex");
     glUniform1i(canTopTexLoc, 1);
 
-    // Bind sky image.
+    /// Bind sky image
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, texture[2]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image[2]->sizeX, image[2]->sizeY, 0,
@@ -292,6 +309,7 @@ void setup(void)
     skyTexLoc = glGetUniformLocation(programId, "skyTex");
     glUniform1i(skyTexLoc, 2);
 
+    /// Bind earth hat
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, texture[3]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image[3]->sizeX, image[3]->sizeY, 0,

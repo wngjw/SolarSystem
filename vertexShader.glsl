@@ -28,22 +28,22 @@ out vec2 texCoordsExport;
 
 struct Light
 {
-    vec4 ambCols;
-    vec4 difCols;
-    vec4 specCols;
+    vec4 lightAmbience;
+    vec4 lightDiffuse;
+    vec4 lightSpecular;
     vec4 coords;
 };
-uniform Light light0;
+uniform Light light;
 
 uniform vec4 globAmb;
 
 struct Material
 {
-    vec4 ambRefl;
-    vec4 difRefl;
-    vec4 specRefl;
-    vec4 emitCols;
-    float shininess;
+    vec4 matAmbience;
+    vec4 matDiffuse;
+    vec4 matSpecular;
+    vec4 matEmittance;
+    float matShininess;
 };
 uniform Material sunMaterial;
 uniform Material planetMaterial;
@@ -51,8 +51,7 @@ uniform Material planetMaterial;
 Material mat;
 
 vec3 normal, lightDirection, eyeDirection, halfway;
-vec4 frontEmit, frontGlobAmb, frontAmb, frontDif, frontSpec,
-     backEmit, backGlobAmb, backAmb, backDif, backSpec;
+vec4 emittance, ambience, diffuse, specular;
 vec4 coords;
 
 void main(void)
@@ -62,22 +61,22 @@ void main(void)
         coords = sunCoords;
         normal = sunNormal;
         texCoordsExport = sunTexCoords;
-        mat.ambRefl = sunMaterial.ambRefl;
-        mat.difRefl = sunMaterial.difRefl;
-        mat.specRefl = sunMaterial.specRefl;
-        mat.emitCols = sunMaterial.emitCols;
-        mat.shininess = sunMaterial.shininess;
+        mat.matAmbience = sunMaterial.matAmbience;
+        mat.matDiffuse = sunMaterial.matDiffuse;
+        mat.matSpecular = sunMaterial.matSpecular;
+        mat.matEmittance = sunMaterial.matEmittance;
+        mat.matShininess = sunMaterial.matShininess;
     }
     if (object == PLANET)
     {
         coords = planetCoords;
         normal = planetNormal;
         texCoordsExport = planetTexCoords;
-        mat.ambRefl = planetMaterial.ambRefl;
-        mat.difRefl = planetMaterial.difRefl;
-        mat.specRefl = planetMaterial.specRefl;
-        mat.emitCols = planetMaterial.emitCols;
-        mat.shininess = planetMaterial.shininess;
+        mat.matAmbience = planetMaterial.matAmbience;
+        mat.matDiffuse = planetMaterial.matDiffuse;
+        mat.matSpecular = planetMaterial.matSpecular;
+        mat.matEmittance = planetMaterial.matEmittance;
+        mat.matShininess = planetMaterial.matShininess;
     }
 
 	if (object == SKY)
@@ -85,11 +84,11 @@ void main(void)
 		coords = skyCoords;
 		normal = skyNormal;
 		texCoordsExport = skyTexCoords;
-		mat.ambRefl = sunMaterial.ambRefl;
-        mat.difRefl = sunMaterial.difRefl;
-        mat.specRefl = sunMaterial.specRefl;
-        mat.emitCols = sunMaterial.emitCols;
-        mat.shininess = sunMaterial.shininess;
+		mat.matAmbience = sunMaterial.matAmbience;
+        mat.matDiffuse = sunMaterial.matDiffuse;
+        mat.matSpecular = sunMaterial.matSpecular;
+        mat.matEmittance = sunMaterial.matEmittance;
+        mat.matShininess = sunMaterial.matShininess;
 	}
 
     if (object == CONE)
@@ -97,25 +96,24 @@ void main(void)
 		coords = coneCoords;
 		normal = coneNormal;
 		texCoordsExport = coneTexCoords;
-		mat.ambRefl = planetMaterial.ambRefl;
-        mat.difRefl = planetMaterial.difRefl;
-        mat.specRefl = planetMaterial.specRefl;
-        mat.emitCols = planetMaterial.emitCols;
-        mat.shininess = planetMaterial.shininess;
+		mat.matAmbience = planetMaterial.matAmbience;
+        mat.matDiffuse = planetMaterial.matDiffuse;
+        mat.matSpecular = planetMaterial.matSpecular;
+        mat.matEmittance = planetMaterial.matEmittance;
+        mat.matShininess = planetMaterial.matShininess;
 	}
 
     normal = normalize(normalMat * normal);
-    lightDirection = normalize(vec3(light0.coords - modelViewMat * coords));
+    lightDirection = normalize(vec3(light.coords - modelViewMat * coords));
     eyeDirection = -1.0f * normalize(vec3(modelViewMat * coords));
     halfway = (length(lightDirection + eyeDirection) == 0.0f) ? vec3(0.0) : (lightDirection + eyeDirection)/length(lightDirection + eyeDirection);
 
-    frontEmit = mat.emitCols;
-    frontGlobAmb = globAmb * mat.ambRefl;
-    frontAmb = light0.ambCols * mat.ambRefl;
-    frontDif = max(dot(normal, lightDirection), 0.0f) * (light0.difCols * mat.difRefl);
-    frontSpec = pow(max(dot(normal, halfway), 0.0f), mat.shininess) * (light0.specCols * mat.specRefl);
-    frontAmbDiffExport =  vec4(vec3(min(frontEmit + frontGlobAmb + frontAmb + frontDif, vec4(1.0))), 1.0);
-    frontSpecExport =  vec4(vec3(min(frontSpec, vec4(1.0))), 1.0);
+    emittance = mat.matEmittance;
+    ambience = light.lightAmbience * mat.matAmbience;
+    diffuse = max(dot(normal, lightDirection), 0.0f) * (light.lightDiffuse * mat.matDiffuse);
+    specular = pow(max(dot(normal, halfway), 0.0f), mat.matShininess) * (light.lightSpecular * mat.matSpecular);
+    frontAmbDiffExport =  vec4(vec3(min(emittance + ambience + diffuse, vec4(1.0))), 1.0);
+    frontSpecExport =  vec4(vec3(min(specular, vec4(1.0))), 1.0);
 
     normal = -1.0f * normal;
 

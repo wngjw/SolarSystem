@@ -1331,7 +1331,7 @@
 1480892865 c:\users\jwang6\desktop\gfx\solarsystem\sphere.h
 	"vertex.h"
 
-1480911077 source:c:\users\jwang6\desktop\gfx\solarsystem\main.cpp
+1480983628 source:c:\users\jwang6\desktop\gfx\solarsystem\main.cpp
 	<cmath>
 	<iostream>
 	<fstream>
@@ -1347,11 +1347,11 @@
 	<glm/gtc/matrix_inverse.hpp>
 	"shader.h"
 	"sphere.h"
-	"disc.h"
 	"light.h"
 	"material.h"
 	"getbmp.h"
 	"vertex.h"
+	"myCone.h"
 
 1477974035 c:\users\jwang6\desktop\gfx\glm\glm\gtc\matrix_transform.hpp
 	"../mat4x4.hpp"
@@ -2014,6 +2014,26 @@
 	"vertex.h"
 
 1480981548 c:\users\ljohnson7\documents\solarsystem\mycone.h
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<OpenGL/glext.h>
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<GL/glext.h>
+	"vertex.h"
+
+1480982629 source:c:\users\jwang6\desktop\gfx\solarsystem\mycone.cpp
+	"myCone.h"
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<OpenGL/glext.h>
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<GL/glext.h>
+	<cmath>
+	"vertex.h"
+
+1480982629 c:\users\jwang6\desktop\gfx\solarsystem\mycone.h
 	<GL/glew.h>
 	<GL/freeglut.h>
 	<OpenGL/glext.h>
