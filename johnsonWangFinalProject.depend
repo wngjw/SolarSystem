@@ -1432,7 +1432,7 @@
 
 1480912205 c:\users\ljohnson7\documents\solarsystem\getbmp.h
 
-1480982007 source:c:\users\ljohnson7\documents\solarsystem\main.cpp
+1480988525 source:c:\users\ljohnson7\documents\solarsystem\main.cpp
 	<cmath>
 	<iostream>
 	<fstream>
@@ -1991,7 +1991,7 @@
 	<GL/freeglut.h>
 	<GL/glext.h>
 
-1480912205 source:c:\users\ljohnson7\documents\solarsystem\sphere.cpp
+1480986020 source:c:\users\ljohnson7\documents\solarsystem\sphere.cpp
 	<cmath>
 	<iostream>
 	<GL/glew.h>
@@ -2002,7 +2002,7 @@
 	<GL/glext.h>
 	"sphere.h"
 
-1480981917 source:c:\users\ljohnson7\documents\solarsystem\mycone.cpp
+1480982338 source:c:\users\ljohnson7\documents\solarsystem\mycone.cpp
 	"myCone.h"
 	<GL/glew.h>
 	<GL/freeglut.h>
@@ -2013,7 +2013,7 @@
 	<cmath>
 	"vertex.h"
 
-1480981548 c:\users\ljohnson7\documents\solarsystem\mycone.h
+1480982332 c:\users\ljohnson7\documents\solarsystem\mycone.h
 	<GL/glew.h>
 	<GL/freeglut.h>
 	<OpenGL/glext.h>
