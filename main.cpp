@@ -73,7 +73,7 @@ static const Light light =
     vec4(0.2, 0.2, 0.2, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
-    vec4(0.0, 0.0, -4.0, 0.0)
+    vec4(0.0, 0.0, 0.0, 0.0)
 };
 
 /**
@@ -105,10 +105,10 @@ static const Material planetMaterial =
 */
 static Vertex skyVertices[4] =
 {
-    {vec4(17.0, -17.0, -5.0, 1.0), vec3(1.0), vec2(1.0, 0.0)},
-    {vec4(17.0, 17.0, -5.0, 1.0), vec3(1.0), vec2(1.0, 1.0)},
-    {vec4(-17.0, -17.0, -5.0, 1.0), vec3(1.0), vec2(0.0, 0.0)},
-    {vec4(-17.0, 17.0, -5.0, 1.0), vec3(1.0), vec2(0.0, 1.0)}
+    {vec4(100.0, -100.0, -20.0, 1.0), vec3(1.0), vec2(1.0, 0.0)},
+    {vec4(100.0, 100.0, -20.0, 1.0), vec3(1.0), vec2(1.0, 1.0)},
+    {vec4(-100.0, -100.0, -20.0, 1.0), vec3(1.0), vec2(0.0, 0.0)},
+    {vec4(-100.0, 100.0, -20.0, 1.0), vec3(1.0), vec2(0.0, 1.0)}
 };
 
 /**
@@ -177,7 +177,7 @@ static BitMapFile *image[4];
 /**
  * Setup configuration for view rotation
  */
-vec4 eyeStart = vec4(0.0, 0.0, 5.0, 1.0);
+vec4 eyeStart = vec4(0.0, 0.0, 30.0, 1.0);
 vec4 eye = eyeStart; // camera location
 mat4 viewRotation;  // rotational part of matrix that transforms between World and Camera coordinates
 vec4 VPN(0,.5,1,0);  // used as starting value for setting uvn
@@ -386,6 +386,13 @@ void bindMarsTexture()
     glUniform1i(marsTexLoc, 4);
 }
 
+void updateNormals(mat4 mvmSave)
+{
+    normalMat = transpose(inverse(mat3(modelViewMat)));
+    glUniformMatrix3fv(normalMatLoc, 1, GL_FALSE, value_ptr(normalMat));
+    modelViewMat = mvmSave;
+}
+
 // Initialization routine.
 void setup(void)
 {
@@ -422,100 +429,116 @@ void setup(void)
     bindMarsTexture();
 }
 
-// Drawing routine.
-void drawScene(void)
+void initView()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     /// Calculate and update projection matrix.
-    projMat = frustum(-1.0, 1.0, -1.0, 1.0, 1.0, 20.0);
+    projMat = frustum(-1.0, 1.0, -1.0, 1.0, 1.0, 100.0);
     glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, value_ptr(projMat));
 
     /// Calculate and update modelview matrix.
     modelViewMat = lookAt(vec3(eye), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+}
 
-    /// Draw the sky
+void drawSky()
+{
     glUniform1ui(objectLoc, SKY);
     glBindVertexArray(vao[SKY]);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
 
-    /// rotate the scene
+void rotateScene()
+{
     modelViewMat = rotate(modelViewMat, viewAngleZ, vec3(0.0, 0.0, 1.0));
     modelViewMat = rotate(modelViewMat, viewAngleY, vec3(0.0, 1.0, 0.0));
     modelViewMat = rotate(modelViewMat, viewAngleX, vec3(1.0, 0.0, 0.0));
-    mat4 mvmsave = modelViewMat;
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+}
 
+void drawSun()
+{
     /// Handle view rotations
     modelViewMat = rotate(modelViewMat, sunAngleZ, vec3(0.0, 0.0, 1.0));
     modelViewMat = rotate(modelViewMat, sunAngleY, vec3(0.0, 1.0, 0.0));
     modelViewMat = rotate(modelViewMat, sunAngleX, vec3(1.0, 0.0, 0.0));
+    modelViewMat = scale(modelViewMat, vec3(6.04, 6.04, 6.04));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
-
-    /// Calculate and update normal matrix.
-    normalMat = transpose(inverse(mat3(modelViewMat)));
-    glUniformMatrix3fv(normalMatLoc, 1, GL_FALSE, value_ptr(normalMat));
-    modelViewMat = mvmsave;
-
     /// Draw sun.
     glUniform1ui(objectLoc, SUN);
     glBindVertexArray(vao[SUN]);
     glMultiDrawElements(GL_TRIANGLE_STRIP, sunCounts, GL_UNSIGNED_INT, (const void **)sunOffsets, SPHERE_LATS);
+}
 
+void drawEarth()
+{
     modelViewMat = rotate(modelViewMat, earthOrbitX, vec3(0.0, 0.0, 1.0));
     modelViewMat = rotate(modelViewMat, earthOrbitY, vec3(0.0, 1.0, 0.0));
     modelViewMat = rotate(modelViewMat, earthOrbitZ, vec3(1.0, 0.0, 0.0));
-    modelViewMat = translate(modelViewMat, vec3(-2.0, 0.0, 0.0));
-    modelViewMat = scale(modelViewMat, vec3(0.2, 0.2, 0.2));
+    modelViewMat = translate(modelViewMat, vec3(-15.0, 0.0, 0.0));
+    modelViewMat = scale(modelViewMat, vec3(2.0, 2.0, 2.0));
     modelViewMat = rotate(modelViewMat, earthRotateX, vec3(0.0, 0.0, 1.0));
     modelViewMat = rotate(modelViewMat, earthRotateY, vec3(0.0, 1.0, 0.0));
     modelViewMat = rotate(modelViewMat, earthRotateZ, vec3(1.0, 0.0, 0.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
-    /// Calculate and update normal matrix.
-    normalMat = transpose(inverse(mat3(modelViewMat)));
-    glUniformMatrix3fv(normalMatLoc, 1, GL_FALSE, value_ptr(normalMat));
-
-    /// Draw planet.
     glUniform1ui(objectLoc, PLANET);
     glBindVertexArray(vao[PLANET]);
     glMultiDrawElements(GL_TRIANGLE_STRIP, planetCounts, GL_UNSIGNED_INT, (const void **)planetOffsets, SPHERE_LATS);
+}
 
-    modelViewMat = mvmsave;
+drawPartyhat()
+{
     modelViewMat = rotate(modelViewMat, earthOrbitX, vec3(0.0, 0.0, 1.0));
     modelViewMat = rotate(modelViewMat, earthOrbitY, vec3(0.0, 1.0, 0.0));
     modelViewMat = rotate(modelViewMat, earthOrbitZ, vec3(1.0, 0.0, 0.0));
-    modelViewMat = translate(modelViewMat, vec3(-2.0, 0.0, 0.0));
+    modelViewMat = translate(modelViewMat, vec3(-15.0, 1.8, 0.0));
+    modelViewMat = rotate(modelViewMat, 0.0f, vec3(1.0, 0.0, 0.0));
+    modelViewMat = scale(modelViewMat, vec3(2.0, 2.0, 2.0));
     modelViewMat = rotate(modelViewMat, earthRotateX, vec3(0.0, 0.0, 1.0));
     modelViewMat = rotate(modelViewMat, earthRotateY, vec3(0.0, 1.0, 0.0));
     modelViewMat = rotate(modelViewMat, earthRotateZ, vec3(1.0, 0.0, 0.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
-
-    /// Calculate and update normal matrix.
-    normalMat = transpose(inverse(mat3(modelViewMat)));
-    glUniformMatrix3fv(normalMatLoc, 1, GL_FALSE, value_ptr(normalMat));
 
     glUniform1ui(objectLoc, CONE);
     glBindVertexArray(vao[CONE]);
     glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices + 2);
+}
 
-    modelViewMat = mvmsave;
+void drawMars()
+{
     modelViewMat = rotate(modelViewMat, marsOrbitX, vec3(0.0, 0.0, 1.0));
     modelViewMat = rotate(modelViewMat, marsOrbitY, vec3(0.0, 1.0, 0.0));
     modelViewMat = rotate(modelViewMat, marsOrbitZ, vec3(1.0, 0.0, 0.0));
-    modelViewMat = translate(modelViewMat, vec3(-3.0, 0.0, 0.0));
-    modelViewMat = scale(modelViewMat, vec3(0.3, 0.3, 0.3));
+    modelViewMat = translate(modelViewMat, vec3(-20.0, 0.0, 0.0));
+    modelViewMat = scale(modelViewMat, vec3(1.22, 1.22, 1.22));
     modelViewMat = rotate(modelViewMat, marsRotateX, vec3(0.0, 0.0, 1.0));
     modelViewMat = rotate(modelViewMat, marsRotateY, vec3(0.0, 1.0, 0.0));
     modelViewMat = rotate(modelViewMat, marsRotateZ, vec3(1.0, 0.0, 0.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
-    /// Draw mars.
     glUniform1ui(objectLoc, MARS);
     glBindVertexArray(vao[MARS]);
     glMultiDrawElements(GL_TRIANGLE_STRIP, marsCounts, GL_UNSIGNED_INT, (const void **)marsOffsets, SPHERE_LATS);
+}
 
+/**
+* Drawing routine
+*/
+void drawScene(void)
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    initView();
+    drawSky();
+    mat4 mvmSave = modelViewMat;
+    rotateScene();
+    drawSun();
+    updateNormals(mvmSave);
+    drawEarth();
+    updateNormals(mvmSave);
+    drawPartyhat();
+    updateNormals(mvmSave);
+    drawMars();
+    updateNormals(mvmSave);
     glutSwapBuffers();
 }
 
@@ -531,15 +554,15 @@ void animate(int value)
 {
     if (isAnimate)
     {
-        sunAngleY += 0.03;
+        sunAngleY += 0.01;
         if (sunAngleY > 360.0) sunAngleY -= 360.0;
-        earthOrbitY += 0.05;
+        earthOrbitY += 0.025;
         if (earthOrbitY > 360.0) earthOrbitY -= 360.0;
-        earthRotateY += 0.08;
+        earthRotateY += 0.06;
         if (earthRotateY > 360.0) earthRotateY -= 360.0;
-        marsOrbitY += 0.04;
+        marsOrbitY += 0.02;
         if (marsOrbitY > 360.0) marsOrbitY -= 360.0;
-        marsRotateY += 0.07;
+        marsRotateY += 0.04;
         if (marsRotateY > 360.0) marsRotateY -= 360.0;
         glutPostRedisplay();
         glutTimerFunc(animationPeriod, animate, 1);
@@ -602,15 +625,14 @@ void keySpecial(int key, int x, int y)
     switch(key)
     {
     case  GLUT_KEY_PAGE_DOWN:
-        eye.z += 0.1;
-        if (eye.z > 12.0) eye.z = 12.0;
+        eye.z += 0.25;
+        if (eye.z > 40.0) eye.z = 40.0;
         break;
     case GLUT_KEY_PAGE_UP:
-        eye.z -= 0.1;
+        eye.z -= 0.25;
         if (eye.z < 2.0) eye.z = 2.0;
         break;
     }
-
     glutPostRedisplay();
 }
 
