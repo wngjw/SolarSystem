@@ -55,9 +55,9 @@ enum buffer {SUN_VERTICES, SUN_INDICES, EARTH_VERTICES, EARTH_INDICES, SKY_VERTI
 static float viewAngleX = 0.1, viewAngleY = 0.05, viewAngleZ = 0.0;
 static float sunAngleX = 0.0, sunAngleY = 0.0, sunAngleZ = 0.0;
 static float earthOrbitX = 0.0, earthOrbitY = 0.0, earthOrbitZ = 0.0;
-static float earthRotateX = 0.0, earthRotateY = 0.0, earthRotateZ = 0.0;
+static float earthRotateX = -82.845, earthRotateY = 0.0, earthRotateZ = 0.0;
 static float marsOrbitX = 0.0, marsOrbitY = 0.0, marsOrbitZ = 0.0;
-static float marsRotateX = 0.0, marsRotateY = 0.0, marsRotateZ = 0.0;
+static float marsRotateX = -90.0, marsRotateY = 0.0, marsRotateZ = 0.0;
 
 /**
 * time between frames in milliseconds
@@ -105,10 +105,10 @@ static const Material planetMaterial =
 */
 static Vertex skyVertices[4] =
 {
-    {vec4(100.0, -100.0, -20.0, 1.0), vec3(1.0), vec2(1.0, 0.0)},
-    {vec4(100.0, 100.0, -20.0, 1.0), vec3(1.0), vec2(1.0, 1.0)},
-    {vec4(-100.0, -100.0, -20.0, 1.0), vec3(1.0), vec2(0.0, 0.0)},
-    {vec4(-100.0, 100.0, -20.0, 1.0), vec3(1.0), vec2(0.0, 1.0)}
+    {vec4(200.0, -200.0, -100.0, 1.0), vec3(1.0), vec2(1.0, 0.0)},
+    {vec4(200.0, 200.0, -100.0, 1.0), vec3(1.0), vec2(1.0, 1.0)},
+    {vec4(-200.0, -200.0, -100.0, 1.0), vec3(1.0), vec2(0.0, 0.0)},
+    {vec4(-200.0, 200.0, -100.0, 1.0), vec3(1.0), vec2(0.0, 1.0)}
 };
 
 /**
@@ -182,6 +182,9 @@ vec4 eye = eyeStart; // camera location
 mat4 viewRotation;  // rotational part of matrix that transforms between World and Camera coordinates
 vec4 VPN(0,.5,1,0);  // used as starting value for setting uvn
 vec4 VUP(0,1,0,1);  // used as starting value for setting uvn
+
+vec4 centerStart = vec4(0.0, 0.0, 0.0, 1.0);
+vec4 center = centerStart;
 
 void calcUVN(vec4 VPN, vec4 VUP)
 {
@@ -432,11 +435,11 @@ void setup(void)
 void initView()
 {
     /// Calculate and update projection matrix.
-    projMat = frustum(-1.0, 1.0, -1.0, 1.0, 1.0, 100.0);
+    projMat = frustum(-1.0, 1.0, -1.0, 1.0, 1.0, 300.0);
     glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, value_ptr(projMat));
 
     /// Calculate and update modelview matrix.
-    modelViewMat = lookAt(vec3(eye), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
+    modelViewMat = lookAt(vec3(eye), vec3(center), vec3(0.0, 1.0, 0.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 }
 
@@ -445,6 +448,30 @@ void drawSky()
     glUniform1ui(objectLoc, SKY);
     glBindVertexArray(vao[SKY]);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+void drawSkybox(mat4 mvmSave)
+{
+    drawSky();
+    modelViewMat = rotate(modelViewMat, 90.0f, vec3(1.0, 0.0, 0.0));
+    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+    drawSky();
+    modelViewMat = mvmSave;
+    modelViewMat = rotate(modelViewMat, -90.0f, vec3(1.0, 0.0, 0.0));
+    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+    drawSky();
+    modelViewMat = mvmSave;
+    modelViewMat = rotate(modelViewMat, 90.0f, vec3(0.0, 1.0, 0.0));
+    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+    drawSky();
+    modelViewMat = mvmSave;
+    modelViewMat = rotate(modelViewMat, -90.0f, vec3(0.0, 1.0, 0.0));
+    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+    drawSky();
+    modelViewMat = mvmSave;
+    modelViewMat = rotate(modelViewMat, 180.0f, vec3(0.0, 0.0, 0.0));
+    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+    drawSky();
 }
 
 void rotateScene()
@@ -494,7 +521,7 @@ drawPartyhat()
     modelViewMat = translate(modelViewMat, vec3(-15.0, 1.8, 0.0));
     modelViewMat = rotate(modelViewMat, 0.0f, vec3(1.0, 0.0, 0.0));
     modelViewMat = scale(modelViewMat, vec3(2.0, 2.0, 2.0));
-    modelViewMat = rotate(modelViewMat, earthRotateX, vec3(0.0, 0.0, 1.0));
+    modelViewMat = rotate(modelViewMat, earthRotateX - earthRotateX, vec3(0.0, 0.0, 1.0));
     modelViewMat = rotate(modelViewMat, earthRotateY, vec3(0.0, 1.0, 0.0));
     modelViewMat = rotate(modelViewMat, earthRotateZ, vec3(1.0, 0.0, 0.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
@@ -528,9 +555,11 @@ void drawScene(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     initView();
-    drawSky();
     mat4 mvmSave = modelViewMat;
+    drawSkybox(mvmSave);
+    updateNormals(mvmSave);
     rotateScene();
+    mvmSave = modelViewMat;
     drawSun();
     updateNormals(mvmSave);
     drawEarth();
@@ -554,13 +583,13 @@ void animate(int value)
 {
     if (isAnimate)
     {
-        sunAngleY += 0.01;
+        sunAngleY -= 0.0011;
         if (sunAngleY > 360.0) sunAngleY -= 360.0;
-        earthOrbitY += 0.025;
+        earthOrbitY -= 0.01;
         if (earthOrbitY > 360.0) earthOrbitY -= 360.0;
-        earthRotateY += 0.06;
+        earthRotateY += 0.04;
         if (earthRotateY > 360.0) earthRotateY -= 360.0;
-        marsOrbitY += 0.02;
+        marsOrbitY -= 0.0188;
         if (marsOrbitY > 360.0) marsOrbitY -= 360.0;
         marsRotateY += 0.04;
         if (marsRotateY > 360.0) marsRotateY -= 360.0;
@@ -579,32 +608,32 @@ void keyInput(unsigned char key, int x, int y)
         break;
     case 'x':
         viewAngleX += 0.05;
-        if (viewAngleX > 360.0) viewAngleX -= 360.0;
+        if (viewAngleX > 360.0) viewAngleX = 360.0;
         glutPostRedisplay();
         break;
     case 'X':
         viewAngleX -= 0.05;
-        if (viewAngleX < 0.0) viewAngleX += 360.0;
+        if (viewAngleX < 0.0) viewAngleX = 0.0;
         glutPostRedisplay();
         break;
     case 'y':
         viewAngleY += 0.05;
-        if (viewAngleY > 360.0) viewAngleY -= 360.0;
+        if (viewAngleY > 360.0) viewAngleY = 360.0;
         glutPostRedisplay();
         break;
     case 'Y':
         viewAngleY -= 0.05;
-        if (viewAngleY < 0.0) viewAngleY += 360.0;
+        if (viewAngleY < 0.0) viewAngleY = 0.0;
         glutPostRedisplay();
         break;
     case 'z':
         viewAngleZ += 0.05;
-        if (viewAngleZ > 360.0) viewAngleZ -= 360.0;
+        if (viewAngleZ > 360.0) viewAngleZ = 360.0;
         glutPostRedisplay();
         break;
     case 'Z':
         viewAngleZ -= 0.05;
-        if (viewAngleZ < 0.0) viewAngleZ += 360.0;
+        if (viewAngleZ < 0.0) viewAngleZ = 0.0;
         glutPostRedisplay();
         break;
     case ' ':
@@ -624,9 +653,25 @@ void keySpecial(int key, int x, int y)
 {
     switch(key)
     {
-    case  GLUT_KEY_PAGE_DOWN:
+    case GLUT_KEY_LEFT:
+        center.x -= 0.5;
+        if (center.x < -90.0) center.x = -90.0;
+        break;
+    case GLUT_KEY_RIGHT:
+        center.x += 0.5;
+        if (center.x > 90.0) center.x = 90.0;
+        break;
+    case GLUT_KEY_UP:
+        center.y += 0.5;
+        if (center.y > 90.0) center.y = 90.0;
+        break;
+    case GLUT_KEY_DOWN:
+        center.y -= 0.5;
+        if (center.y < -90.0) center.y = -90.0;
+        break;
+    case GLUT_KEY_PAGE_DOWN:
         eye.z += 0.25;
-        if (eye.z > 40.0) eye.z = 40.0;
+        if (eye.z > 100.0) eye.z = 100.0;
         break;
     case GLUT_KEY_PAGE_UP:
         eye.z -= 0.25;
@@ -654,7 +699,7 @@ int main(int argc, char **argv)
     glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
 
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-    glutInitWindowSize(500, 500);
+    glutInitWindowSize(800, 800);
     glutInitWindowPosition(100, 100);
     glutCreateWindow("The Sun");
     glutDisplayFunc(drawScene);
