@@ -5,6 +5,7 @@ const int PLANET = 1;
 const int SKY = 2;
 const int CONE = 3;
 const int MARS = 4;
+const int MERCURY = 5;
 
 layout(location=0) in vec4 sunCoords;
 layout(location=1) in vec3 sunNormal;
@@ -21,6 +22,9 @@ layout(location=11) in vec2 coneTexCoords;
 layout(location=12) in vec4 marsCoords;
 layout(location=13) in vec3 marsNormal;
 layout(location=14) in vec2 marsTexCoords;
+layout(location=15) in vec4 mercuryCoords;
+layout(location=16) in vec3 mercuryNormal;
+layout(location=17) in vec2 mercuryTexCoords;
 
 uniform mat4 modelViewMat;
 uniform mat4 projMat;
@@ -119,6 +123,18 @@ void main(void)
         mat.matShininess = planetMaterial.matShininess;
 	}
 
+	if (object == MERCURY)
+	{
+		coords = mercuryCoords;
+		normal = mercuryNormal;
+		texCoordsExport = marsTexCoords;
+		mat.matAmbience = planetMaterial.matAmbience;
+        mat.matDiffuse = planetMaterial.matDiffuse;
+        mat.matSpecular = planetMaterial.matSpecular;
+        mat.matEmittance = planetMaterial.matEmittance;
+        mat.matShininess = planetMaterial.matShininess;
+	}
+	
     normal = normalize(normalMat * normal);
     lightDirection = normalize(vec3(modelViewMat * light.coords - modelViewMat * coords));
     eyeDirection = -1.0f * normalize(vec3(modelViewMat * coords));

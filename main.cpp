@@ -45,12 +45,13 @@ using namespace glm;
 /**
 * VAO ids
 */
-enum object {SUN, EARTH, SKY, CONE, MARS};
+enum object {SUN, EARTH, SKY, CONE, MARS, MERCURY};
 
 /**
 * VBO ids
 */
-enum buffer {SUN_VERTICES, SUN_INDICES, EARTH_VERTICES, EARTH_INDICES, SKY_VERTICES, CONE_VERTICES, MARS_VERTICES, MARS_INDICES};
+enum buffer {SUN_VERTICES, SUN_INDICES, EARTH_VERTICES, EARTH_INDICES, SKY_VERTICES, CONE_VERTICES,
+            MARS_VERTICES, MARS_INDICES, MERCURY_VERTICES, MERCURY_INDICES};
 
 static float viewAngleX = 0.1, viewAngleY = 0.05, viewAngleZ = 0.0;
 static float sunAngleX = 0.0, sunAngleY = 0.0, sunAngleZ = 0.0;
@@ -143,6 +144,14 @@ static int marsCounts[SPHERE_LATS];
 static void* marsOffsets[SPHERE_LATS];
 
 /**
+* Initial configuration for mercury
+*/
+static Vertex mercuryVertices[(SPHERE_LONGS + 1) * (SPHERE_LATS + 1)];
+static unsigned int mercuryIndices[SPHERE_LATS][2 * (SPHERE_LONGS + 1)];
+static int mercuryCounts[SPHERE_LATS];
+static void* mercuryOffsets[SPHERE_LATS];
+
+/**
 * Constructing and initializing a hat
 */
 MyCone earthHat = MyCone(0.2, 1.0);
@@ -158,21 +167,22 @@ modelViewMatLoc,
 normalMatLoc,
 projMatLoc,
 sunTexLoc,
+mercuryTexLoc,
 earthTexLoc,
 marsTexLoc,
 skyTexLoc,
 hatTexLoc,
 objectLoc,
-buffer[8],
-vao[5],
-texture[5],
+buffer[10],
+vao[6],
+texture[6],
 width,
 height;
 
 /**
 * Texture bitmaps
 */
-static BitMapFile *image[4];
+static BitMapFile *image[6];
 
 /**
  * Setup configuration for view rotation
@@ -265,6 +275,38 @@ void createVaoMars()
                           (void*)(sizeof(marsVertices[0].coords) + sizeof(marsVertices[0].normal)));
     glEnableVertexAttribArray(14);
 }
+
+void createVaoMercury()
+{
+    glBindVertexArray(vao[MERCURY]);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer[MERCURY_VERTICES]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(mercuryVertices), mercuryVertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[MERCURY_INDICES]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mercuryIndices), mercuryIndices, GL_STATIC_DRAW);
+    glVertexAttribPointer(15, 4, GL_FLOAT, GL_FALSE, sizeof(mercuryVertices[0]), 0);
+    glEnableVertexAttribArray(15);
+    glVertexAttribPointer(16, 3, GL_FLOAT, GL_FALSE, sizeof(mercuryVertices[0]), (void*)sizeof(mercuryVertices[0].coords));
+    glEnableVertexAttribArray(16);
+    glVertexAttribPointer(17, 2, GL_FLOAT, GL_FALSE, sizeof(mercuryVertices[0]),
+                          (void*)(sizeof(mercuryVertices[0].coords) + sizeof(mercuryVertices[0].normal)));
+    glEnableVertexAttribArray(17);
+}
+
+//void createVaoMercury()
+//{
+//    glBindVertexArray(vao[MERCURY]);
+//    glBindBuffer(GL_ARRAY_BUFFER, buffer[MERCURY_VERTICES]);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(mercuryVertices), mercuryVertices, GL_STATIC_DRAW);
+//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[MERCURY_INDICES]);
+//    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mercuryIndices), mercuryIndices, GL_STATIC_DRAW);
+//    glVertexAttribPointer(15, 4, GL_FLOAT, GL_FALSE, sizeof(mercuryVertices[0]), 0);
+//    glEnableVertexAttribArray(15);
+//    glVertexAttribPointer(16, 3, GL_FLOAT, GL_FALSE, sizeof(mercuryVertices[0]), (void*)sizeof(mercuryVertices[0].coords));
+//    glEnableVertexAttribArray(16);
+//    glVertexAttribPointer(17, 2, GL_FLOAT, GL_FALSE, sizeof(mercuryVertices[0]),
+//                          (void*)(sizeof(mercuryVertices[0].coords) + sizeof(mercuryVertices[0].normal)));
+//    glEnableVertexAttribArray(17);
+//}
 
 void createAndLinkShader()
 {
@@ -386,6 +428,22 @@ void bindMarsTexture()
     glUniform1i(marsTexLoc, 4);
 }
 
+void bindMercuryTexture()
+{
+    image[5] = getbmp("mercury_texture.bmp");
+    glActiveTexture(GL_TEXTURE5);
+    glBindTexture(GL_TEXTURE_2D, texture[5]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image[5]->sizeX, image[5]->sizeY, 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, image[5]->data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    mercuryTexLoc = glGetUniformLocation(programId, "mercuryTex");
+    glUniform1i(mercuryTexLoc, 5);
+}
+
 void updateNormals(mat4 mvmSave)
 {
     normalMat = transpose(inverse(mat3(modelViewMat)));
@@ -408,18 +466,20 @@ void setup(void)
     fillSphere(sunVertices, sunIndices, sunCounts, sunOffsets);
     fillSphere(earthVertices, earthIndices, earthCounts, earthOffsets);
     fillSphere(marsVertices, marsIndices, marsCounts, marsOffsets);
+    fillSphere(mercuryVertices, mercuryIndices, mercuryCounts, mercuryOffsets);
 
     /// Create VAO's
-    glGenVertexArrays(5, vao);
-    glGenBuffers(8, buffer);
+    glGenVertexArrays(6, vao);
+    glGenBuffers(10, buffer);
     createVaoSun();
     createVaoEarth();
     createVaoSky();
     createVaoCone();
     createVaoMars();
+    createVaoMercury();
 
     /// Create texture ids.
-    glGenTextures(5, texture);
+    glGenTextures(6, texture);
 
     /// Bind textures
     bindSunTexture();
@@ -427,6 +487,7 @@ void setup(void)
     bindSkyTexture();
     bindEarthHat();
     bindMarsTexture();
+    //bindMercuryTexture();
 }
 
 void initView()
