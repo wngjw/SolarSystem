@@ -10,7 +10,7 @@ in vec4 frontAmbDiffExport, frontSpecExport;
 in vec2 texCoordsExport;
 
 uniform sampler2D sunTex;
-uniform sampler2D planetTex;
+uniform sampler2D earthTex;
 uniform sampler2D skyTex;
 uniform sampler2D hatTex;
 uniform sampler2D marsTex;
@@ -23,7 +23,7 @@ vec4 texColor;
 void main(void)
 {
     if (object == SUN) texColor = texture(sunTex, texCoordsExport);
-    if (object == PLANET) texColor = texture(planetTex, texCoordsExport);
+    if (object == PLANET) texColor = texture(earthTex, texCoordsExport);
 	if (object == SKY) texColor = texture(skyTex, texCoordsExport);
 	if (object == CONE) texColor = texture(hatTex, texCoordsExport);
 	if (object == MARS) texColor = texture(marsTex, texCoordsExport);

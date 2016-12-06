@@ -45,12 +45,12 @@ using namespace glm;
 /**
 * VAO ids
 */
-enum object {SUN, PLANET, SKY, CONE, MARS};
+enum object {SUN, EARTH, SKY, CONE, MARS};
 
 /**
 * VBO ids
 */
-enum buffer {SUN_VERTICES, SUN_INDICES, PLANET_VERTICES, PLANET_INDICES, SKY_VERTICES, CONE_VERTICES, MARS_VERTICES, MARS_INDICES};
+enum buffer {SUN_VERTICES, SUN_INDICES, EARTH_VERTICES, EARTH_INDICES, SKY_VERTICES, CONE_VERTICES, MARS_VERTICES, MARS_INDICES};
 
 static float viewAngleX = 0.1, viewAngleY = 0.05, viewAngleZ = 0.0;
 static float sunAngleX = 0.0, sunAngleY = 0.0, sunAngleZ = 0.0;
@@ -127,12 +127,12 @@ static int sunCounts[SPHERE_LATS];
 static void* sunOffsets[SPHERE_LATS];
 
 /**
-* Initial configuration for planet
+* Initial configuration for earth
 */
-static Vertex planetVertices[(SPHERE_LONGS + 1) * (SPHERE_LATS + 1)];
-static unsigned int planetIndices[SPHERE_LATS][2 * (SPHERE_LONGS + 1)];
-static int planetCounts[SPHERE_LATS];
-static void* planetOffsets[SPHERE_LATS];
+static Vertex earthVertices[(SPHERE_LONGS + 1) * (SPHERE_LATS + 1)];
+static unsigned int earthIndices[SPHERE_LATS][2 * (SPHERE_LONGS + 1)];
+static int earthCounts[SPHERE_LATS];
+static void* earthOffsets[SPHERE_LATS];
 
 /**
 * Initial configuration for mars
@@ -145,7 +145,7 @@ static void* marsOffsets[SPHERE_LATS];
 /**
 * Constructing and initializing a hat
 */
-MyCone planetHat = MyCone(0.2, 1.0);
+MyCone earthHat = MyCone(0.2, 1.0);
 
 /**
  * Initial configuration for the shader
@@ -208,19 +208,19 @@ void createVaoSun()
     glEnableVertexAttribArray(2);
 }
 
-void createVaoPlanet()
+void createVaoEarth()
 {
-    glBindVertexArray(vao[PLANET]);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer[PLANET_VERTICES]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(planetVertices), planetVertices, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[PLANET_INDICES]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(planetIndices), planetIndices, GL_STATIC_DRAW);
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(planetVertices[0]), 0);
+    glBindVertexArray(vao[EARTH]);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer[EARTH_VERTICES]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(earthVertices), earthVertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[EARTH_INDICES]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(earthIndices), earthIndices, GL_STATIC_DRAW);
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(earthVertices[0]), 0);
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(planetVertices[0]), (void*)sizeof(planetVertices[0].coords));
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(earthVertices[0]), (void*)sizeof(earthVertices[0].coords));
     glEnableVertexAttribArray(4);
-    glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, sizeof(planetVertices[0]),
-                          (void*)(sizeof(planetVertices[0].coords) + sizeof(planetVertices[0].normal)));
+    glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, sizeof(earthVertices[0]),
+                          (void*)(sizeof(earthVertices[0].coords) + sizeof(earthVertices[0].normal)));
     glEnableVertexAttribArray(5);
 }
 
@@ -241,12 +241,12 @@ void createVaoCone()
 {
     glBindVertexArray(vao[CONE]);
     glBindBuffer(GL_ARRAY_BUFFER, buffer[CONE_VERTICES]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(planetHat.vertices), planetHat.vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, sizeof(planetHat.vertices[0]), 0);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(earthHat.vertices), earthHat.vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, sizeof(earthHat.vertices[0]), 0);
     glEnableVertexAttribArray(9);
-    glVertexAttribPointer(10, 3, GL_FLOAT, GL_FALSE, sizeof(planetHat.vertices[0]), (void*)sizeof(planetHat.vertices[0].coords));
+    glVertexAttribPointer(10, 3, GL_FLOAT, GL_FALSE, sizeof(earthHat.vertices[0]), (void*)sizeof(earthHat.vertices[0].coords));
     glEnableVertexAttribArray(10);
-    glVertexAttribPointer(11, 2, GL_FLOAT, GL_FALSE, sizeof(planetHat.vertices[0]), (void*)(sizeof(planetHat.vertices[0].coords) + sizeof(planetHat.vertices[0].normal)));
+    glVertexAttribPointer(11, 2, GL_FLOAT, GL_FALSE, sizeof(earthHat.vertices[0]), (void*)(sizeof(earthHat.vertices[0].coords) + sizeof(earthHat.vertices[0].normal)));
     glEnableVertexAttribArray(11);
 }
 
@@ -334,7 +334,7 @@ void bindEarthTexture()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glGenerateMipmap(GL_TEXTURE_2D);
-    earthTexLoc = glGetUniformLocation(programId, "planetTex");
+    earthTexLoc = glGetUniformLocation(programId, "earthTex");
     glUniform1i(earthTexLoc, 1);
 }
 
@@ -406,14 +406,14 @@ void setup(void)
 
     /// Fill vertices, normals, and textures of VAOs
     fillSphere(sunVertices, sunIndices, sunCounts, sunOffsets);
-    fillSphere(planetVertices, planetIndices, planetCounts, planetOffsets);
+    fillSphere(earthVertices, earthIndices, earthCounts, earthOffsets);
     fillSphere(marsVertices, marsIndices, marsCounts, marsOffsets);
 
     /// Create VAO's
     glGenVertexArrays(5, vao);
     glGenBuffers(8, buffer);
     createVaoSun();
-    createVaoPlanet();
+    createVaoEarth();
     createVaoSky();
     createVaoCone();
     createVaoMars();
@@ -481,9 +481,9 @@ void drawEarth()
     modelViewMat = rotate(modelViewMat, earthRotateZ, vec3(1.0, 0.0, 0.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
-    glUniform1ui(objectLoc, PLANET);
-    glBindVertexArray(vao[PLANET]);
-    glMultiDrawElements(GL_TRIANGLE_STRIP, planetCounts, GL_UNSIGNED_INT, (const void **)planetOffsets, SPHERE_LATS);
+    glUniform1ui(objectLoc, EARTH);
+    glBindVertexArray(vao[EARTH]);
+    glMultiDrawElements(GL_TRIANGLE_STRIP, earthCounts, GL_UNSIGNED_INT, (const void **)earthOffsets, SPHERE_LATS);
 }
 
 drawPartyhat()

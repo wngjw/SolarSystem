@@ -9,9 +9,9 @@ const int MARS = 4;
 layout(location=0) in vec4 sunCoords;
 layout(location=1) in vec3 sunNormal;
 layout(location=2) in vec2 sunTexCoords;
-layout(location=3) in vec4 planetCoords;
-layout(location=4) in vec3 planetNormal;
-layout(location=5) in vec2 planetTexCoords;
+layout(location=3) in vec4 earthCoords;
+layout(location=4) in vec3 earthNormal;
+layout(location=5) in vec2 earthTexCoords;
 layout(location=6) in vec4 skyCoords;
 layout(location=7) in vec3 skyNormal;
 layout(location=8) in vec2 skyTexCoords;
@@ -73,9 +73,9 @@ void main(void)
     }
     if (object == PLANET)
     {
-        coords = planetCoords;
-        normal = planetNormal;
-        texCoordsExport = planetTexCoords;
+        coords = earthCoords;
+        normal = earthNormal;
+        texCoordsExport = earthTexCoords;
         mat.matAmbience = planetMaterial.matAmbience;
         mat.matDiffuse = planetMaterial.matDiffuse;
         mat.matSpecular = planetMaterial.matSpecular;
